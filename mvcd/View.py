@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 COLORS = {
     "background": "#0a0c0f",
     "panel_bg": "#1b1b1b",
+    "panel_active": "#4b8f29",  # Active/green panel background
     "border": "#666666",
     "text_primary": "#ffffff",
     "text_secondary": "#ff9900",
@@ -30,9 +31,6 @@ class DisplayPanel(tk.Frame):
     """
     A panel displaying a single value, its name, and optional unit.
     Also applies color-coding logic depending on the parameter type.
-
-    Each panel can be assigned a static width and height so it never
-    resizes when text changes.
     """
     def __init__(
         self,
@@ -49,11 +47,12 @@ class DisplayPanel(tk.Frame):
         name_padx=5,
         name_pady=(0, 0),
         width=200,   # default width if not specified
-        height=100   # default height if not specified
+        height=100,  # default height if not specified
+        bg_color=None # Optional custom background color
     ):
         super().__init__(
             parent,
-            bg=COLORS["panel_bg"],
+            bg=bg_color if bg_color else COLORS["panel_bg"],
             highlightthickness=1,
             highlightcolor=COLORS["border"]
         )
@@ -76,7 +75,7 @@ class DisplayPanel(tk.Frame):
             text=f"{value}{(' ' + self.unit) if self.unit else ''}",
             font=self.font_value,
             fg=self.get_value_color(value),
-            bg=COLORS["panel_bg"],
+            bg=self["bg"],
             borderwidth=0
         )
         self.value_label.pack(
@@ -92,7 +91,7 @@ class DisplayPanel(tk.Frame):
             text=name,
             font=self.font_name,
             fg=COLORS["text_secondary"],
-            bg=COLORS["panel_bg"],
+            bg=self["bg"],
             borderwidth=0
         )
         self.name_label.pack(
@@ -115,16 +114,37 @@ class DisplayPanel(tk.Frame):
         """
         Determine the foreground color based on self.panel_id and thresholds.
         """
-        # Expand this with your logic/thresholds
-        if self.panel_id == "Air Temp":
+        # Expanded thresholds based on parameter types
+        if self.panel_id == "Air Temp" or self.panel_id == "Accu Temp":
             if val > 60:
                 return COLORS['accent_critical']
             elif val > 40:
                 return COLORS['accent_warning']
             else:
                 return COLORS['accent_normal']
+        elif self.panel_id in ["Motor L Temp", "Motor R Temp", "Inverter L Temp", "Inverter R Temp"]:
+            if val > 80:
+                return COLORS['accent_critical']
+            elif val > 60:
+                return COLORS['accent_warning']
+            else:
+                return COLORS['accent_normal']
+        elif self.panel_id == "SOC":
+            if val < 20:
+                return COLORS['accent_critical']
+            elif val < 30:
+                return COLORS['accent_warning']
+            else:
+                return COLORS['accent_normal']
+        elif self.panel_id == "Lowest Cell":
+            if val < 3.2:
+                return COLORS['accent_critical']
+            elif val < 3.5:
+                return COLORS['accent_warning']
+            else:
+                return COLORS['accent_normal']
+                
         return COLORS['accent_normal']
-
 
 # --------------------------------------------------------------------------
 # PanelGroup
@@ -137,6 +157,7 @@ class PanelGroup(tk.Frame):
     def __init__(self, parent, model, items, group_bg=COLORS["panel_bg"]):
         super().__init__(parent, bg=group_bg)
         self.model = model
+        self.panels = {}  # Dictionary to store panels by ID
 
         for item in items:
             self.add_item(item)
@@ -173,6 +194,7 @@ class PanelGroup(tk.Frame):
             value_pady = item.get("value_pady", 5)
             name_padx = item.get("name_padx", 5)
             name_pady = item.get("name_pady", (0, 5))
+            bg_color = item.get("bg_color", COLORS["panel_bg"])
 
             # If user sets "width"/"height" in the dict, we pass them along
             width = item.get("width", 200)
@@ -192,9 +214,11 @@ class PanelGroup(tk.Frame):
                 name_padx=name_padx,
                 name_pady=name_pady,
                 width=width,
-                height=height
+                height=height,
+                bg_color=bg_color
             )
             dp.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=4, pady=4)
+            self.panels[raw_id] = dp
 
         # 4) string -> param ID
         elif isinstance(item, str):
@@ -212,6 +236,7 @@ class PanelGroup(tk.Frame):
                 model=self.model
             )
             dp.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=4, pady=4)
+            self.panels[panel_id] = dp
         else:
             label = tk.Label(
                 self,
@@ -253,6 +278,7 @@ class PanelGroup(tk.Frame):
                     name_pady = sub_item.get("name_pady", (0, 5))
                     width = sub_item.get("width", 200)
                     height = sub_item.get("height", 100)
+                    bg_color = sub_item.get("bg_color", COLORS["panel_bg"])
 
                     if "rowspan" in sub_item:
                         rowspan = sub_item["rowspan"]
@@ -273,11 +299,13 @@ class PanelGroup(tk.Frame):
                         name_padx=name_padx,
                         name_pady=name_pady,
                         width=width,
-                        height=height
+                        height=height,
+                        bg_color=bg_color
                     )
                     dp.grid(row=row_idx, column=col_idx,
                             rowspan=rowspan, columnspan=colspan,
                             padx=4, pady=4, sticky='nsew')
+                    self.panels[raw_id] = dp
 
                 elif isinstance(sub_item, str):
                     val = self.model.get_value(sub_item)
@@ -293,6 +321,7 @@ class PanelGroup(tk.Frame):
                     dp.grid(row=row_idx, column=col_idx,
                             rowspan=rowspan, columnspan=colspan,
                             padx=4, pady=4, sticky='nsew')
+                    self.panels[sub_item] = dp
                 else:
                     lbl = tk.Label(
                         grid_frame,
@@ -313,13 +342,26 @@ class PanelGroup(tk.Frame):
             grid_frame.columnconfigure(c, weight=1)
 
     def update_panel_value(self, panel_id, new_value):
+        # First check if we have this panel directly
+        if panel_id in self.panels:
+            self.panels[panel_id].update_value(new_value)
+            return True
+            
+        # Then check for nested panels
         for child in self.winfo_children():
-            if isinstance(child, DisplayPanel):
-                if child.panel_id == panel_id:
-                    child.update_value(new_value)
-            elif isinstance(child, PanelGroup):
-                child.update_panel_value(panel_id, new_value)
-
+            if isinstance(child, PanelGroup):
+                if child.update_panel_value(panel_id, new_value):
+                    return True
+                    
+        # Then check frames that might contain DisplayPanels    
+        for child in self.winfo_children():
+            if isinstance(child, tk.Frame) and not isinstance(child, PanelGroup):
+                for subchild in child.winfo_children():
+                    if isinstance(subchild, DisplayPanel) and subchild.panel_id == panel_id:
+                        subchild.update_value(new_value)
+                        return True
+        
+        return False
 
 # --------------------------------------------------------------------------
 # EventScreen
@@ -351,10 +393,15 @@ class EventScreen:
         self.parent.grid_rowconfigure(0, weight=1)
 
     def update_value(self, panel_id, value):
+        updated_left = False
+        updated_right = False
+        
         if self.left_group:
-            self.left_group.update_panel_value(panel_id, value)
+            updated_left = self.left_group.update_panel_value(panel_id, value)
         if self.right_group:
-            self.right_group.update_panel_value(panel_id, value)
+            updated_right = self.right_group.update_panel_value(panel_id, value)
+            
+        return updated_left or updated_right
 
 
 # --------------------------------------------------------------------------
@@ -378,22 +425,56 @@ class Display(tk.Tk):
         self.main_frame = tk.Frame(self, bg=COLORS["background"])
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
+        # Create various screens, all initially hidden
         self.header_frame = self.create_header_frame(self.main_frame)
         self.header_frame.config(height=50)
         self.header_frame.pack_propagate(False)
         self.header_frame.pack(side=tk.TOP, fill=tk.X)
 
+        # Main driving screen (event screens)
         self.split_frame = tk.Frame(self.main_frame, bg=COLORS["background"])
         self.split_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        self.menu_frame = self.create_menu_frame(self.main_frame)
-        self.menu_event_frame = self.create_event_menu_frame(self.main_frame)
+        # Menu screens
+        self.menu_main_frame = self.create_menu_frame(self.main_frame, "Menu Screen")
+        self.menu_debug_frame = self.create_menu_frame(self.main_frame, "Debugging Screen")
+        self.menu_ecu_frame = self.create_menu_frame(self.main_frame, "ECU Versions and Activity")
+        self.menu_tsoff_frame = self.create_menu_frame(self.main_frame, "TS OFF Screen")
+        
+        # Create menu button frames
+        self.menu_main_buttons = self.create_main_menu_buttons(self.menu_main_frame)
+        self.menu_debug_content = self.create_debug_screen(self.menu_debug_frame)
+        self.menu_ecu_content = self.create_ecu_screen(self.menu_ecu_frame)
+        
+        # Hide all menu frames initially
+        self.menu_main_frame.pack_forget()
+        self.menu_debug_frame.pack_forget()
+        self.menu_ecu_frame.pack_forget()
+        self.menu_tsoff_frame.pack_forget()
 
+        # Initialize current screen and set up initial event screen
         self.current_screen = None
+        self.current_menu = None
         self.create_event_screen(self.model.current_event)
-        self.create_buttons()
+        
+        # Button references (will be initialized later)
+        self.button1 = None
+        self.button2 = None
+        self.button3 = None
+        self.button4 = None
+        self.button5 = None
+        self.button6 = None
+        self.button7 = None
+        self.button8 = None
+        
+        # Button lists for menu navigation
+        self.main_menu_button_list = []
+        self.main_menu_frames = []
+        self.event_menu_button_list = []
+        self.event_menu_frames = []
+        self.active_button = 0  # Track active button index
 
-        # Blink logo
+        # Blink logo for visual feedback
         self.logo_blink_state = True
         self.after(1000, self.toggle_logo)
         self.focus_set()
@@ -436,6 +517,7 @@ class Display(tk.Tk):
         return header_frame
 
     def toggle_logo(self):
+        """Blink the logo for visual feedback"""
         if self.logo_label and self.logo_image_full and self.logo_image_blank:
             if self.logo_blink_state:
                 self.logo_label.config(image=self.logo_image_blank)
@@ -444,165 +526,506 @@ class Display(tk.Tk):
             self.logo_blink_state = not self.logo_blink_state
         self.after(1500, self.toggle_logo)
 
-    def create_menu_frame(self, parent):
-        return tk.Frame(parent, bg=COLORS["menu_bg"])
+    def create_menu_frame(self, parent, title="Menu"):
+        """Create a base frame for a menu screen with header"""
+        frame = tk.Frame(parent, bg=COLORS["menu_bg"])
+        
+        # Add the menu title
+        title_frame = tk.Frame(frame, bg=COLORS["header_bg"], height=40)
+        title_frame.pack(side=tk.TOP, fill=tk.X, pady=(0, 10))
+        
+        title_label = tk.Label(
+            title_frame, 
+            text=title,
+            font=("Segoe UI", 18, "bold"),
+            fg=COLORS["text_primary"],
+            bg=COLORS["header_bg"]
+        )
+        title_label.pack(side=tk.TOP, pady=5)
+        
+        return frame
 
-    def create_event_menu_frame(self, parent):
-        return tk.Frame(parent, bg=COLORS["menu_bg"])
-
-    def create_buttons(self):
-        self.menu_container = tk.Frame(self.menu_frame, bg=COLORS["menu_bg"])
-        self.menu_container.place(relx=0.5, rely=0.5, anchor="center")
-
-        highlight_frame1 = tk.Frame(self.menu_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame1.pack(pady=10)
-        self.button1 = tk.Button(
-            highlight_frame1,
-            text="Add random value",
+    def create_main_menu_buttons(self, parent):
+        """Create buttons for the main menu screen"""
+        container = tk.Frame(parent, bg=COLORS["menu_bg"])
+        container.place(relx=0.5, rely=0.5, anchor="center")
+        
+        buttons = []
+        
+        # Menu options based on the diagram
+        menu_options = [
+            "Change Max Torque Setting",
+            "Change Max Power",
+            "Recalibrate Throttle Position: Set upper",
+            "Recalibrate Throttle Position: Set lower",
+            "Display Debugging Screen",
+            "Display ECU Version Screen",
+            "Display TS OFF"
+        ]
+        
+        # Action bindings for menu buttons
+        actions = [
+            lambda: self.show_debug_message("Changing Max Torque Setting"),
+            lambda: self.show_debug_message("Changing Max Power"),
+            lambda: self.show_debug_message("Calibrating upper throttle"),
+            lambda: self.show_debug_message("Calibrating lower throttle"),
+            lambda: self.show_menu_screen(self.menu_debug_frame),
+            lambda: self.show_menu_screen(self.menu_ecu_frame),
+            lambda: self.show_menu_screen(self.menu_tsoff_frame)
+        ]
+        
+        # Create buttons with highlight frames
+        for i, (text, action) in enumerate(zip(menu_options, actions)):
+            highlight_frame = tk.Frame(container, bg=COLORS["menu_bg"], bd=2)
+            highlight_frame.pack(pady=10)
+            
+            button = tk.Button(
+                highlight_frame,
+                text=text,
+                font=FONT_BUTTON,
+                fg="#ffffff",
+                bg="#333333",
+                activebackground="#444444",
+                width=30,
+                borderwidth=0,
+                command=action
+            )
+            button.pack()
+            buttons.append(button)
+            
+            # Store in the class for accessibility by controller
+            if i == 0:
+                self.button1 = button
+            elif i == 1:
+                self.button2 = button
+            elif i == 2:
+                self.button3 = button
+            elif i == 3:
+                self.button4 = button
+            elif i == 4:
+                self.button5 = button
+            elif i == 5:
+                self.button6 = button
+            elif i == 6:
+                self.button7 = button
+        
+        # Add back button
+        highlight_frame = tk.Frame(container, bg=COLORS["menu_bg"], bd=2)
+        highlight_frame.pack(pady=10)
+        
+        back_button = tk.Button(
+            highlight_frame,
+            text="Back to Driving Screen",
             font=FONT_BUTTON,
             fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
+            bg="#555555",
+            activebackground="#666666",
+            width=30,
+            borderwidth=0,
+            command=self.return_to_event_screen
         )
-        self.button1.pack()
+        back_button.pack()
+        buttons.append(back_button)
+        self.button8 = back_button
+        
+        self.main_menu_button_list = buttons
+        
+        return container
 
-        highlight_frame2 = tk.Frame(self.menu_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame2.pack(pady=10)
-        self.button2 = tk.Button(
-            highlight_frame2,
-            text="Event Selection",
+    def create_debug_screen(self, parent):
+        """Create the debugging screen layout"""
+        content_frame = tk.Frame(parent, bg=COLORS["background"])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Split into left and right sections
+        left_frame = tk.Frame(content_frame, bg=COLORS["background"])
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        right_frame = tk.Frame(content_frame, bg=COLORS["background"])
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+        # Debugging Data section (left)
+        debug_label = tk.Label(
+            left_frame,
+            text="Debugging Data",
+            font=FONT_HEADER,
+            fg=COLORS["text_primary"],
+            bg=COLORS["background"]
+        )
+        debug_label.pack(anchor=tk.W, pady=(0, 10))
+        
+        # Create a scrollable text widget for debug data
+        debug_text = tk.Text(
+            left_frame,
+            font=("Segoe UI", 12),
+            fg=COLORS["text_primary"],
+            bg=COLORS["panel_bg"],
+            height=15,
+            width=40
+        )
+        debug_text.pack(fill=tk.BOTH, expand=True)
+        
+        # Add some placeholder text
+        debug_text.insert(tk.END, "Brake Pressure Front: 0\n")
+        debug_text.insert(tk.END, "Brake Pressure Rear: 0\n")
+        debug_text.insert(tk.END, "Throttle Position: 0\n")
+        debug_text.insert(tk.END, "Throttle Position Lower: 0\n")
+        debug_text.insert(tk.END, "Throttle Position Upper: 0\n")
+        debug_text.insert(tk.END, "Steering Wheel Angle: 0\n")
+        debug_text.insert(tk.END, "Competition Datalogger Active: No\n")
+        debug_text.config(state=tk.DISABLED)  # Make read-only
+        
+        # Right frame (status panels)
+        # Create telemetry panels on the right using PanelGroup
+        telemetry_panels = [
+            [{"id": "Accu Temp", "name": "Accu Temp", "font_value": ("Segoe UI", 36, "bold"), 
+              "bg_color": COLORS["panel_active"], "width": 200, "height": 100}],
+            [{"id": "Lowest Cell", "name": "Lowest Cell", "font_value": ("Segoe UI", 36, "bold"),
+              "bg_color": COLORS["panel_active"], "width": 200, "height": 100}],
+            [
+                [{"id": "Inverter L Temp", "name": "Inverter L Temp", "font_value": ("Segoe UI", 24, "bold"),
+                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}],
+                [{"id": "Inverter R Temp", "name": "Inverter R Temp", "font_value": ("Segoe UI", 24, "bold"),
+                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}]
+            ],
+            [
+                [{"id": "Motor L Temp", "name": "Motor L Temp", "font_value": ("Segoe UI", 24, "bold"),
+                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}],
+                [{"id": "Motor R Temp", "name": "Motor R Temp", "font_value": ("Segoe UI", 24, "bold"),
+                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}]
+            ]
+        ]
+        
+        debug_panels = PanelGroup(right_frame, self.model, telemetry_panels)
+        debug_panels.pack(fill=tk.BOTH, expand=True)
+        
+        # Back button at the bottom
+        back_frame = tk.Frame(parent, bg=COLORS["menu_bg"], height=50)
+        back_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        back_button = tk.Button(
+            back_frame,
+            text="Back to Main Menu",
             font=FONT_BUTTON,
             fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
+            bg="#555555",
+            activebackground="#666666",
+            width=20,
+            command=lambda: self.show_menu_screen(self.menu_main_frame)
         )
-        self.button2.pack()
+        back_button.pack(side=tk.RIGHT, padx=20, pady=10)
+        
+        return content_frame
 
-        highlight_frame3 = tk.Frame(self.menu_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame3.pack(pady=10)
-        self.button3 = tk.Button(
-            highlight_frame3,
-            text="TBI",
+    def create_ecu_screen(self, parent):
+        """Create the ECU version screen layout"""
+        content_frame = tk.Frame(parent, bg=COLORS["background"])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Title for ECU versions
+        ecu_title = tk.Label(
+            content_frame,
+            text="ECU Versions on the CAN Busses and their Software Versions",
+            font=FONT_HEADER,
+            fg=COLORS["text_primary"],
+            bg=COLORS["background"]
+        )
+        ecu_title.pack(anchor=tk.W, pady=(10, 20))
+        
+        # Create a table-like display for ECU versions
+        ecu_frame = tk.Frame(content_frame, bg=COLORS["panel_bg"])
+        ecu_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Headers
+        headers = ["ECU Name", "Software Version", "Status"]
+        for i, header in enumerate(headers):
+            header_label = tk.Label(
+                ecu_frame,
+                text=header,
+                font=("Segoe UI", 14, "bold"),
+                fg=COLORS["text_secondary"],
+                bg=COLORS["panel_bg"]
+            )
+            header_label.grid(row=0, column=i, sticky="w", padx=10, pady=5)
+        
+        # Sample ECU data - would be populated from CAN signals
+        ecu_data = [
+            ("VCU", "1.2.5", "Online"),
+            ("AMS", "2.0.1", "Online"),
+            ("DIU", "1.3.0", "Online"),
+            ("ASPU", "1.1.2", "Online"),
+            ("ASCU", "1.0.3", "Online"),
+            ("DRS", "1.4.1", "Online")
+        ]
+        
+        for i, (name, version, status) in enumerate(ecu_data, start=1):
+            name_label = tk.Label(
+                ecu_frame,
+                text=name,
+                font=("Segoe UI", 12),
+                fg=COLORS["text_primary"],
+                bg=COLORS["panel_bg"]
+            )
+            name_label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
+            
+            version_label = tk.Label(
+                ecu_frame,
+                text=version,
+                font=("Segoe UI", 12),
+                fg=COLORS["text_primary"],
+                bg=COLORS["panel_bg"]
+            )
+            version_label.grid(row=i, column=1, sticky="w", padx=10, pady=5)
+            
+            status_color = COLORS["accent_normal"] if status == "Online" else COLORS["accent_critical"]
+            status_label = tk.Label(
+                ecu_frame,
+                text=status,
+                font=("Segoe UI", 12),
+                fg=status_color,
+                bg=COLORS["panel_bg"]
+            )
+            status_label.grid(row=i, column=2, sticky="w", padx=10, pady=5)
+        
+        # Configure grid weights
+        ecu_frame.columnconfigure(0, weight=1)
+        ecu_frame.columnconfigure(1, weight=1)
+        ecu_frame.columnconfigure(2, weight=1)
+        
+        # Back button
+        back_frame = tk.Frame(parent, bg=COLORS["menu_bg"], height=50)
+        back_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        back_button = tk.Button(
+            back_frame,
+            text="Back to Main Menu",
             font=FONT_BUTTON,
             fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
+            bg="#555555",
+            activebackground="#666666",
+            width=20,
+            command=lambda: self.show_menu_screen(self.menu_main_frame)
         )
-        self.button3.pack()
+        back_button.pack(side=tk.RIGHT, padx=20, pady=10)
+        
+        return content_frame
 
-        self.main_menu_button_list = [self.button1, self.button2, self.button3]
-        self.main_menu_frames = [highlight_frame1, highlight_frame2, highlight_frame3]
-
-        self.menu_event_container = tk.Frame(self.menu_event_frame, bg=COLORS["menu_bg"])
-        self.menu_event_container.place(relx=0.5, rely=0.5, anchor="center")
-
-        highlight_frame4 = tk.Frame(self.menu_event_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame4.pack(pady=10)
-        self.button4 = tk.Button(
-            highlight_frame4,
-            text="Autocross",
-            font=FONT_BUTTON,
-            fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
+    def show_debug_message(self, message):
+        """Show a debug message/action in a popup"""
+        popup = tk.Toplevel(self)
+        popup.title("Action")
+        popup.geometry("300x150")
+        popup.configure(bg=COLORS["panel_bg"])
+        
+        message_label = tk.Label(
+            popup,
+            text=message,
+            font=("Segoe UI", 14),
+            fg=COLORS["text_primary"],
+            bg=COLORS["panel_bg"],
+            wraplength=280
         )
-        self.button4.pack()
-
-        highlight_frame5 = tk.Frame(self.menu_event_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame5.pack(pady=10)
-        self.button5 = tk.Button(
-            highlight_frame5,
-            text="Endurance",
-            font=FONT_BUTTON,
-            fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
+        message_label.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+        
+        close_button = tk.Button(
+            popup,
+            text="Close",
+            font=("Segoe UI", 12),
+            command=popup.destroy
         )
-        self.button5.pack()
+        close_button.pack(pady=10)
+        
+        # Center the popup on the screen
+        popup.update_idletasks()
+        width = popup.winfo_width()
+        height = popup.winfo_height()
+        x = (self.winfo_width() // 2) - (width // 2)
+        y = (self.winfo_height() // 2) - (height // 2)
+        popup.geometry(f"+{x}+{y}")
+        
+        # Make the popup modal
+        popup.transient(self)
+        popup.grab_set()
+        self.wait_window(popup)
 
-        highlight_frame6 = tk.Frame(self.menu_event_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame6.pack(pady=10)
-        self.button6 = tk.Button(
-            highlight_frame6,
-            text="Acceleration",
-            font=FONT_BUTTON,
-            fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
-        )
-        self.button6.pack()
+    def show_menu_screen(self, menu_frame):
+        """Show one of the menu screens"""
+        # Hide all frames first
+        self.split_frame.pack_forget()
+        self.header_frame.pack_forget()
+        self.menu_main_frame.pack_forget()
+        self.menu_debug_frame.pack_forget()
+        self.menu_ecu_frame.pack_forget()
+        self.menu_tsoff_frame.pack_forget()
+        
+        # Show the requested menu frame
+        menu_frame.pack(fill=tk.BOTH, expand=True)
+        self.current_menu = menu_frame
 
-        highlight_frame7 = tk.Frame(self.menu_event_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame7.pack(pady=10)
-        self.button7 = tk.Button(
-            highlight_frame7,
-            text="Skidpad",
-            font=FONT_BUTTON,
-            fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
-        )
-        self.button7.pack()
-
-        highlight_frame8 = tk.Frame(self.menu_event_container, bg=COLORS["menu_bg"], bd=2)
-        highlight_frame8.pack(pady=10)
-        self.button8 = tk.Button(
-            highlight_frame8,
-            text="Practice",
-            font=FONT_BUTTON,
-            fg="#ffffff",
-            bg="#333333",
-            activebackground="#444444",
-            width=18,
-            borderwidth=0
-        )
-        self.button8.pack()
-
-        self.event_menu_button_list = [self.button4, self.button5, self.button6, self.button7, self.button8]
-        self.event_menu_frames = [highlight_frame4, highlight_frame5, highlight_frame6, highlight_frame7, highlight_frame8]
-
-        self.menu_frame.pack_forget()
-        self.menu_event_frame.pack_forget()
-
-    def menu_pop(self):
-        if self.menu_frame.winfo_ismapped() or self.menu_event_frame.winfo_ismapped():
-            self.menu_frame.pack_forget()
-            self.menu_event_frame.pack_forget()
-            self.header_frame.pack(side=tk.TOP, fill=tk.X)
-            self.split_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        else:
-            self.split_frame.pack_forget()
-            self.header_frame.pack_forget()
-            self.menu_frame.pack(fill=tk.BOTH, expand=True)
-
-    def menu_event_selector(self):
-        self.menu_frame.pack_forget()
-        self.menu_event_frame.pack(fill=tk.BOTH, expand=True)
+    def return_to_event_screen(self):
+        """Return to the main event screen from any menu"""
+        # Hide all menu frames
+        self.menu_main_frame.pack_forget()
+        self.menu_debug_frame.pack_forget()
+        self.menu_ecu_frame.pack_forget()
+        self.menu_tsoff_frame.pack_forget()
+        
+        # Show the main interface
+        self.header_frame.pack(side=tk.TOP, fill=tk.X)
+        self.split_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def create_event_screen(self, event_name):
+        """Create the appropriate event screen based on the event name"""
         # Clear existing
         for child in self.split_frame.winfo_children():
             child.destroy()
 
-        layout = self._build_event_layout(event_name)
+        # Build layouts based on the diagram
+        if event_name == "endurance":
+            layout = self._build_endurance_layout()
+        elif event_name in ["autocross", "skidpad", "acceleration"]:
+            layout = self._build_autocross_layout(event_name)
+        else:
+            # Fallback to a generic layout from the model
+            layout = self._build_generic_layout(event_name)
+            
         self.current_screen = EventScreen(event_name, self.model, self.split_frame, layout)
         self.mode_label.config(text=f"AMI: Manual Driving - {event_name.capitalize()}")
 
-    def _build_event_layout(self, event_name):
+    def _build_endurance_layout(self):
+        """Create the endurance screen layout based on the diagram"""
+        return {
+            "left": [
+                # Big SOC panel (top left)
+                {"id": "SOC", "name": "SOC %", 
+                 "font_value": ("Segoe UI", 56, "bold"),
+                 "font_name": ("Segoe UI", 36),
+                 "value_pady": (13, 0),
+                 "width": 400, "height": 150,
+                 "bg_color": COLORS["panel_active"]},
+                
+                # Lowest Cell panel (bottom left)
+                {"id": "Lowest Cell", "name": "Lowest Cell",
+                 "font_value": ("Segoe UI", 46, "bold"),
+                 "font_name": ("Segoe UI", 22),
+                 "value_pady": (20, 0),
+                 "bg_color": COLORS["panel_active"]}
+            ],
+            "right": [
+                # Top right panels (TC, TV, Max Torque)
+                [
+                    [{"id": "TC", "name": "TC",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12)}],
+                    [{"id": "TV", "name": "TV",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12)}],
+                    [{"id": "Max Torque", "name": "Max Torque",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12)}]
+                ],
+                
+                # DRS and Accu Temp row
+                [
+                    {"id": "DRS", "name": "DRS",
+                     "font_value": ("Segoe UI", 28, "bold"),
+                     "font_name": ("Segoe UI", 12)},
+                    {"id": "Accu Temp", "name": "Accu Temp",
+                     "font_value": ("Segoe UI", 36, "bold"),
+                     "font_name": ("Segoe UI", 12),
+                     "colspan": 2,
+                     "bg_color": COLORS["panel_active"]}
+                ],
+                
+                # Temperature grid (bottom right)
+                [
+                    [{"id": "Motor L Temp", "name": "Motor L Temp",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12),
+                      "bg_color": COLORS["panel_active"]},
+                     {"id": "Motor R Temp", "name": "Motor R Temp",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12),
+                      "bg_color": COLORS["panel_active"]}],
+                    [{"id": "Inverter L Temp", "name": "Inverter L Temp",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12),
+                      "bg_color": COLORS["panel_active"]},
+                     {"id": "Inverter R Temp", "name": "Inverter R Temp",
+                      "font_value": ("Segoe UI", 28, "bold"),
+                      "font_name": ("Segoe UI", 12),
+                      "bg_color": COLORS["panel_active"]}]
+                ]
+            ]
+        }
+
+    def _build_autocross_layout(self, event_name):
+        """Create the autocross/skidpad/acceleration screen layout based on the diagram"""
+        return {
+            "left": [
+                # DRS indicator (top)
+                {"id": "DRS", "name": "DRS Indicator",
+                 "font_value": ("Segoe UI", 50, "bold"),
+                 "font_name": ("Segoe UI", 30),
+                 "width": 200, "height": 150},
+                
+                # Vehicle control modes (middle)
+                [
+                    [{"id": "Traction Control Mode", "name": "Traction Control Mode",
+                      "font_value": ("Segoe UI", 20, "bold"),
+                      "font_name": ("Segoe UI", 10)}],
+                    [{"id": "Torque Vectoring Mode", "name": "Torque Vectoring Mode",
+                      "font_value": ("Segoe UI", 20, "bold"),
+                      "font_name": ("Segoe UI", 10)}],
+                    [{"id": "Max Torque", "name": "Max Torque",
+                      "font_value": ("Segoe UI", 20, "bold"),
+                      "font_name": ("Segoe UI", 10)}]
+                ]
+            ],
+            "right": [
+                # Lowest Cell and Accu Temp (top right)
+                [
+                    [{"id": "Lowest Cell", "name": "Lowest Cell",
+                      "font_value": ("Segoe UI", 42, "bold"),
+                      "font_name": ("Segoe UI", 22),
+                      "value_pady": (20, 0),
+                      "bg_color": COLORS["panel_active"]},
+                     {"id": "Accu Temp", "name": "Accu Temp",
+                      "font_value": ("Segoe UI", 42, "bold"),
+                      "font_name": ("Segoe UI", 22),
+                      "value_pady": (20, 0),
+                      "value_padx": 37,
+                      "bg_color": COLORS["panel_active"]}]
+                ],
+                
+                # Temperature grid (bottom right)
+                [
+                    [{"id": "Motor L Temp", "name": "Motor L Temp",
+                      "font_value": ("Segoe UI", 32, "bold"),
+                      "font_name": ("Segoe UI", 16),
+                      "value_pady": (10, 0),
+                      "bg_color": COLORS["panel_active"]},
+                     {"id": "Motor R Temp", "name": "Motor R Temp",
+                      "font_value": ("Segoe UI", 32, "bold"),
+                      "font_name": ("Segoe UI", 16),
+                      "value_pady": (10, 0),
+                      "bg_color": COLORS["panel_active"]}],
+                    [{"id": "Inverter L Temp", "name": "Inverter L Temp",
+                      "font_value": ("Segoe UI", 32, "bold"),
+                      "font_name": ("Segoe UI", 16),
+                      "value_pady": (10, 0),
+                      "bg_color": COLORS["panel_active"]},
+                     {"id": "Inverter R Temp", "name": "Inverter R Temp",
+                      "font_value": ("Segoe UI", 32, "bold"),
+                      "font_name": ("Segoe UI", 16),
+                      "value_pady": (10, 0),
+                      "bg_color": COLORS["panel_active"]}]
+                ]
+            ]
+        }
+
+    def _build_generic_layout(self, event_name):
+        """Create a generic layout from the model's event_screens"""
         params = self.model.event_screens.get(event_name, [])
         midpoint = len(params) // 2
         left_params = params[:midpoint]
@@ -612,6 +1035,30 @@ class Display(tk.Tk):
             "right": right_params
         }
 
+    def menu_pop(self):
+        """Toggle between main screen and main menu"""
+        if self.menu_main_frame.winfo_ismapped() or self.menu_debug_frame.winfo_ismapped() or \
+           self.menu_ecu_frame.winfo_ismapped() or self.menu_tsoff_frame.winfo_ismapped():
+            # Return to main screen if we're in any menu
+            self.return_to_event_screen()
+        else:
+            # Go to main menu
+            self.split_frame.pack_forget()
+            self.header_frame.pack_forget()
+            self.show_menu_screen(self.menu_main_frame)
+
+    def _highlight_main_menu_button(self, button_index):
+        """Highlight a specific button in the menu"""
+        # Reset all buttons to default
+        for frame in self.main_menu_frames:
+            frame.config(bg=COLORS["menu_bg"])
+            
+        # Highlight the selected button
+        if 0 <= button_index < len(self.main_menu_frames):
+            self.main_menu_frames[button_index].config(bg=COLORS["accent_normal"])
+            self.active_button = button_index
+
     def handle_value_update(self, panel_id, value):
+        """Update a value in the current screen"""
         if self.current_screen:
             self.current_screen.update_value(panel_id, value)

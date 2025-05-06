@@ -1,0 +1,153 @@
+2025-05-06 12:26:22,967 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:26:22,980 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:26:22,981 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:26:22,981 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:26:22,981 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:26:23,034 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:26:23,631 - root - CRITICAL - Fatal error: 'NoneType' object has no attribute 'config'
+Traceback (most recent call last):
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 71, in main
+    controller = Controller(model, view, can_model.bus)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 26, in __init__
+    self.view.button1.config(command=self.random_update_value)        # "Add random value"
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'config'
+2025-05-06 12:28:38,927 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:28:38,933 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:28:38,934 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:28:38,935 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:28:38,935 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:28:38,985 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:28:39,110 - root - CRITICAL - Fatal error: 'NoneType' object has no attribute 'config'
+Traceback (most recent call last):
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 71, in main
+    controller = Controller(model, view, can_model.bus)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 26, in __init__
+    self.view.button1.config(command=self.random_update_value)        # "Add random value"
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'config'
+2025-05-06 12:30:36,874 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:30:36,882 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:30:36,883 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:30:36,883 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:30:36,883 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:30:36,940 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:30:37,081 - root - CRITICAL - Fatal error: 'NoneType' object has no attribute 'config'
+Traceback (most recent call last):
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 71, in main
+    controller = Controller(model, view, can_model.bus)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 27, in __init__
+    self.setup_button_actions()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 62, in setup_button_actions
+    self.view.button1.config(command=self.toggle_demo_mode)
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'config'
+2025-05-06 12:31:22,010 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:31:22,017 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:31:22,018 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:31:22,018 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:31:22,018 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:31:22,070 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:31:22,197 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-06 12:31:22,197 - root - CRITICAL - Fatal error: 'Controller' object has no attribute 'demo_thread'
+Traceback (most recent call last):
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 71, in main
+    controller = Controller(model, view, can_model.bus)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 39, in __init__
+    self.start_demo_mode()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\Controller.py", line 163, in start_demo_mode
+    if self.demo_thread is None or not self.demo_thread.is_alive():
+       ^^^^^^^^^^^^^^^^
+AttributeError: 'Controller' object has no attribute 'demo_thread'
+2025-05-06 12:34:18,588 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:34:18,595 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:34:18,596 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:34:18,596 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:34:18,596 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:34:18,651 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:34:18,777 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-06 12:34:18,777 - root - INFO - Demo mode started
+2025-05-06 12:34:18,777 - root - INFO - Formula Student Car Display started
+2025-05-06 12:34:18,777 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-06 12:34:18,777 - root - INFO - Demo mode: Disabled
+2025-05-06 12:34:18,778 - root - INFO - Debug mode: Disabled
+2025-05-06 12:34:34,319 - root - INFO - Demo mode stopped
+2025-05-06 12:34:35,300 - root - INFO - Demo mode started
+2025-05-06 12:34:38,286 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,537 - root - INFO - Demo mode started
+2025-05-06 12:34:38,567 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,627 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,687 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,748 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,808 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,869 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,928 - root - INFO - Demo mode stopped
+2025-05-06 12:34:38,993 - root - INFO - Demo mode stopped
+2025-05-06 12:34:39,484 - root - INFO - Demo mode stopped
+2025-05-06 12:34:43,765 - root - INFO - Demo mode started
+2025-05-06 12:35:51,815 - root - INFO - Application shutdown
+2025-05-06 12:49:56,974 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:49:56,982 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:49:56,983 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:49:56,983 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:49:56,984 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:49:57,035 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:49:57,044 - Model - INFO - Configuration loaded successfully
+2025-05-06 12:49:57,159 - root - CRITICAL - Fatal error: tuple index out of range
+Traceback (most recent call last):
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\main.py", line 68, in main
+    view = Display(model)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 535, in __init__
+    self.menu_debug_content = self.create_debug_screen(self.menu_debug_frame)
+                              ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 788, in create_debug_screen
+    debug_panels = PanelGroup(right_frame, self.model, telemetry_panels)
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 255, in __init__
+    self.add_item(item)
+    ~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 266, in add_item
+    sub_group = PanelGroup(self, self.model, item, group_bg=self['bg'])
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 255, in __init__
+    self.add_item(item)
+    ~~~~~~~~~~~~~^^^^^^
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 294, in add_item
+    dp = DisplayPanel(
+        self,
+    ...<12 lines>...
+        height=height
+    )
+  File "c:\Users\aleck\Documents\Hawks\h20_diu-ami_gui\mvcd\View.py", line 73, in __init__
+    self.font_name_weight = font_name_override[2] if font_name_override and len(font_name_override) > 2 else FONT_NAME[2]
+                                                                                                             ~~~~~~~~~^^^
+IndexError: tuple index out of range
+2025-05-06 12:50:33,348 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:50:33,355 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-06 12:50:33,355 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:50:33,356 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-06 12:50:33,356 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-06 12:50:33,410 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-06 12:50:33,410 - Model - INFO - Configuration loaded successfully
+2025-05-06 12:50:33,534 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-06 12:50:33,535 - root - INFO - Demo mode started
+2025-05-06 12:50:33,535 - root - INFO - Formula Student Car Display started
+2025-05-06 12:50:33,535 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-06 12:50:33,535 - root - INFO - Demo mode: Disabled
+2025-05-06 12:50:33,535 - root - INFO - Debug mode: Disabled
+2025-05-06 12:50:46,075 - root - INFO - Application shutdown

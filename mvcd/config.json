@@ -1,0 +1,29 @@
+{
+  "values": {
+    "AMS": 0,
+    "IMD": 0,
+    "Watt Hours": 0,
+    "ASPU": 0,
+    "Aux Voltage": 0,
+    "SOC": 80.1,
+    "Air Temp": 26.9,
+    "Lowest Cell": 3.7,
+    "Inverter Temp": 0,
+    "Battery Temp": 0,
+    "Motor Temp": 0,
+    "Max Torque": 87,
+    "Speed": 65.1,
+    "Lap Time": 0,
+    "Accu Temp": 33.3,
+    "Inverter L Temp": 58.2,
+    "Inverter R Temp": 57.3,
+    "Motor L Temp": 55.3,
+    "Motor R Temp": 62.4,
+    "TC": 5,
+    "Traction Control Mode": "Custom",
+    "TV": 2,
+    "Torque Vectoring Mode": "Off",
+    "DRS": "On"
+  },
+  "current_event": "autocross"
+}
