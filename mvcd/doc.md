@@ -1,8 +1,8 @@
-# Formula Student Car Display Documentation
+# DIU Documentation
 
 ## Overview
 
-The Formula Student Car Display is a Python application that implements a digital dashboard for Formula Student racing cars. It communicates with the car's systems via CAN bus, displays real-time telemetry data, and allows configuration of various vehicle parameters.
+The DIU Display is a Python application that implements a digital dashboard for FS racing. It communicates with the car's systems via CAN bus, displays real-time telemetry data, and allows configuration of various vehicle parameters.
 
 The application follows the Model-View-Controller (MVC) architecture pattern:
 - **Model**: Manages data, business logic, and CAN communication

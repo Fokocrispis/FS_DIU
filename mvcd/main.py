@@ -8,18 +8,18 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("formula_student_gui.log"),
+        logging.FileHandler("DIU.log"),
         logging.StreamHandler()
     ]
 )
 
 def main():
     """
-    Main entry point for the Formula Student Car Display application.
+    Main entry point for the DIU application.
     Parses command line arguments, initializes components, and starts the GUI.
     """
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Formula Student Car Display")
+    parser = argparse.ArgumentParser(description="Hawks Display")
     parser.add_argument("--virtual", action="store_true", help="Use virtual CAN (vcan0) instead of real CAN")
     parser.add_argument("--demo", action="store_true", help="Run in demo mode with simulated values")
     parser.add_argument("--dbc", type=str, default="H19_CAN_dbc.dbc", help="Path to DBC file")
@@ -83,7 +83,7 @@ def main():
         AllMsg(secondary_window, controller, dbc_path=args.dbc)
     
     # Log startup status
-    logging.info("Formula Student Car Display started")
+    logging.info("DIU Display started")
     logging.info(f"Using DBC file: {args.dbc}")
     logging.info(f"Demo mode: {'Enabled' if args.demo else 'Disabled'}")
     logging.info(f"Debug mode: {'Enabled' if args.debug else 'Disabled'}")

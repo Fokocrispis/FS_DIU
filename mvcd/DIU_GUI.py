@@ -4,7 +4,7 @@ from tkinter import ttk
 
 def create_main_window():
     root = tk.Tk()
-    root.title("Formula Student Car Display")
+    root.title("Hawks Display")
     root.configure(bg="#121212")
     root.geometry("1024x768")
     root.minsize(800, 600)
