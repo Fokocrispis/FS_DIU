@@ -26,3 +26,79 @@
 2025-05-06 13:36:22,973 - root - INFO - Demo mode: Disabled
 2025-05-06 13:36:22,973 - root - INFO - Debug mode: Disabled
 2025-05-06 13:36:25,884 - root - INFO - Application shutdown
+2025-05-07 16:39:39,447 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:39:39,486 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-07 16:39:39,488 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:39:39,489 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:39:39,489 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-07 16:39:39,623 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:39:39,626 - Model - INFO - Configuration loaded successfully
+2025-05-07 16:39:40,791 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-07 16:39:40,792 - root - INFO - Demo mode started
+2025-05-07 16:39:40,792 - root - INFO - DIU Display started
+2025-05-07 16:39:40,793 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-07 16:39:40,793 - root - INFO - Demo mode: Disabled
+2025-05-07 16:39:40,794 - root - INFO - Debug mode: Disabled
+2025-05-07 16:39:55,724 - root - INFO - Demo mode stopped
+2025-05-07 16:39:56,967 - root - INFO - Demo mode started
+2025-05-07 16:39:58,290 - root - INFO - Demo mode stopped
+2025-05-07 16:40:00,361 - root - INFO - Demo mode started
+2025-05-07 16:40:32,606 - root - INFO - Demo mode stopped
+2025-05-07 16:42:22,329 - root - INFO - Application shutdown
+2025-05-07 16:42:23,503 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:42:23,522 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-07 16:42:23,523 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:42:23,524 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:42:23,525 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-07 16:42:23,676 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:42:23,691 - Model - INFO - Configuration loaded successfully
+2025-05-07 16:42:23,985 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-07 16:42:23,986 - root - INFO - Demo mode started
+2025-05-07 16:42:23,987 - root - INFO - DIU Display started
+2025-05-07 16:42:23,987 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-07 16:42:23,987 - root - INFO - Demo mode: Disabled
+2025-05-07 16:42:23,988 - root - INFO - Debug mode: Disabled
+2025-05-07 16:42:39,621 - root - INFO - Demo mode stopped
+2025-05-07 16:43:51,500 - root - INFO - Application shutdown
+2025-05-07 16:43:52,704 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:43:52,721 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-07 16:43:52,723 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:43:52,724 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:43:52,725 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-07 16:43:52,854 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:43:52,872 - Model - INFO - Configuration loaded successfully
+2025-05-07 16:43:53,181 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-07 16:43:53,182 - root - INFO - Demo mode started
+2025-05-07 16:43:53,183 - root - INFO - DIU Display started
+2025-05-07 16:43:53,183 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-07 16:43:53,183 - root - INFO - Demo mode: Disabled
+2025-05-07 16:43:53,184 - root - INFO - Debug mode: Disabled
+2025-05-07 16:44:32,592 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:44:32,608 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-07 16:44:32,610 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:44:32,611 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:44:32,611 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-07 16:44:32,748 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:44:32,749 - Model - INFO - Configuration loaded successfully
+2025-05-07 16:44:33,052 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-07 16:44:33,053 - root - INFO - Demo mode started
+2025-05-07 16:44:33,053 - root - INFO - DIU Display started
+2025-05-07 16:44:33,053 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-07 16:44:33,054 - root - INFO - Demo mode: Disabled
+2025-05-07 16:44:33,054 - root - INFO - Debug mode: Disabled
+2025-05-07 16:45:13,743 - root - INFO - Application shutdown
+2025-05-07 16:46:09,714 - can_model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:46:09,730 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-05-07 16:46:09,732 - can_model - WARNING - Failed to initialize CAN bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:46:09,733 - can_model - ERROR - Failed to initialize virtual CAN bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-05-07 16:46:09,734 - can_model - INFO - Falling back to no-op CAN mode (no real bus).
+2025-05-07 16:46:09,862 - Model - INFO - DBC file loaded successfully: H19_CAN_dbc.dbc
+2025-05-07 16:46:09,876 - Model - INFO - Configuration loaded successfully
+2025-05-07 16:46:10,170 - root - WARNING - No CAN bus available. Starting in demo mode.
+2025-05-07 16:46:10,171 - root - INFO - Demo mode started
+2025-05-07 16:46:10,171 - root - INFO - DIU Display started
+2025-05-07 16:46:10,172 - root - INFO - Using DBC file: H19_CAN_dbc.dbc
+2025-05-07 16:46:10,172 - root - INFO - Demo mode: Disabled
+2025-05-07 16:46:10,172 - root - INFO - Debug mode: Disabled
+2025-05-07 16:46:30,982 - root - INFO - Demo mode stopped
+2025-05-07 16:46:31,965 - root - INFO - Demo mode started

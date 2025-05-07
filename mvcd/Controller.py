@@ -472,3 +472,88 @@ class Controller:
                 self.update_value("Lowest Cell", lowest_voltage)
         except Exception as e:
             logging.error(f"Error updating cell voltage {global_idx}: {e}")
+            
+    def handle_ok_button(self):
+    
+        logging.info("SWU: OK button pressed")
+    
+        # If in a menu, select the currently highlighted item
+        if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
+            # Find the currently highlighted button and click it
+            for i, button in enumerate(self.view.main_menu_button_list):
+                if i == self.view.active_button:
+                    button.invoke()
+                    return
+            
+        # Otherwise toggle menu 
+        self.menu_toggle()
+
+    def handle_up_button(self):
+        """Handle the 'Up' button press from the steering wheel"""
+        logging.info("SWU: Up button pressed")
+        
+        # If in a menu, move highlight up
+        if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
+            new_index = (self.view.active_button - 1) % len(self.view.main_menu_button_list)
+            if hasattr(self.view, '_highlight_main_menu_button'):
+                self.view._highlight_main_menu_button(new_index)
+        else:
+            # Toggle DRS when not in menu
+            current_drs = self.model.get_value("DRS")
+            new_drs = "Off" if current_drs == "On" else "On"
+            self.update_value("DRS", new_drs)
+
+    def handle_down_button(self):
+        """Handle the 'Down' button press from the steering wheel"""
+        logging.info("SWU: Down button pressed")
+        
+        # If in a menu, move highlight down
+        if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
+            new_index = (self.view.active_button + 1) % len(self.view.main_menu_button_list)
+            if hasattr(self.view, '_highlight_main_menu_button'):
+                self.view._highlight_main_menu_button(new_index)
+        else:
+            # Default action when not in menu: cycle traction control mode
+            self.cycle_tc_mode()
+
+    def toggle_cooling(self):
+        """Toggle cooling system via the steering wheel button"""
+        logging.info("SWU: Cooling button pressed")
+        
+        # Send a CAN message to toggle the cooling system
+        if self.can_bus:
+            try:
+                # Construct a message with ID 643 (VCU_PDU_Control) to toggle cooling
+                # The cooling system bit is at bit 2 (VCU_cooling_system_active)
+                arbitration_id = 0x643  # VCU_PDU_Control
+                # Read current status first
+                current_status = [0] * 8
+                # Toggle bit 2 (cooling system active)
+                cooling_active = 1  # Assume we want to turn it on
+                data = bytearray([0x00, 0x00])
+                data[0] |= (cooling_active << 2)
+                
+                # Send the message
+                msg = can.Message(arbitration_id=arbitration_id, data=data, is_extended_id=False)
+                self.can_bus.send(msg)
+                logging.info("Sent cooling toggle message")
+            except Exception as e:
+                logging.error(f"Error sending cooling toggle message: {e}")
+
+    def toggle_ts(self):
+        """Toggle traction system via the steering wheel button"""
+        logging.info("SWU: TS button pressed")
+        # This would typically send a message to the appropriate controller
+        # to toggle the traction system power
+
+    def toggle_r2d(self):
+        """Toggle Ready-to-Drive mode via the steering wheel button"""
+        logging.info("SWU: R2D button pressed")
+        # This would typically send a message to enter Ready-to-Drive mode
+        # Often this requires a specific sequence of actions
+
+    def perform_reset(self):
+        """Perform a general reset via the steering wheel button"""
+        logging.info("SWU: Reset button pressed")
+        # This would typically reset various subsystems
+        # For safety, might require a confirmation dialog

@@ -361,6 +361,47 @@ class AllMsg:
             696, "DIU_Menu_open",
             lambda value: self.controller.menu_toggle() if value == 1 else None
         )
+        
+        # DIU_Button_States (ID: 688) signals for steering wheel buttons
+        self.dispatcher.register_callback(
+            688, "DIU_Button_1_Menu",
+            lambda value: self.controller.menu_toggle() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_2_OK",
+            lambda value: self.controller.handle_ok_button() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_3_Cooling",
+            lambda value: self.controller.toggle_cooling() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_4_Overall_Reset",
+            lambda value: self.controller.perform_reset() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_5_TS_On",
+            lambda value: self.controller.toggle_ts() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_6_R2D",
+            lambda value: self.controller.toggle_r2d() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_6_9_Down_RadioActive",
+            lambda value: self.controller.handle_down_button() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            688, "DIU_Button_8_Up_DRS",
+            lambda value: self.controller.handle_up_button() if value == 1 else None
+        )
     
     def apply_filter(self):
         """Apply filters to the Treeview"""

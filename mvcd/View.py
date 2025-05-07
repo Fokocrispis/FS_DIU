@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 COLORS = {
     "background": "#0a0c0f",
     "panel_bg": "#1b1b1b",
-    "panel_active": "#4b8f29",  # Active/green panel background
+    "panel_active": "#1b1b1b",  
     "border": "#666666",
     "text_primary": "#ffffff",
     "text_secondary": "#ff9900",
@@ -60,14 +60,20 @@ class DisplayPanel(tk.Frame):
         self.name = name
         self.unit = unit
         self.model = model
+        self.initial_font_value = font_value_override or FONT_VALUE
+        self.initial_font_name = font_name_override or FONT_NAME
+        self.value_padx = value_padx
+        self.value_pady = value_pady
+        self.name_padx = name_padx
+        self.name_pady = name_pady
 
         # Force a static width & height
         self.config(width=width, height=height)
         self.pack_propagate(False)  # or grid_propagate(False) if using .grid()
 
-        # Decide which fonts to use
-        self.font_value = font_value_override or FONT_VALUE
-        self.font_name = font_name_override or FONT_NAME
+        # Current font sizes (will be adjusted when resizing)
+        self.font_value = self.initial_font_value
+        self.font_name = self.initial_font_name
 
         # Value Label
         self.value_label = tk.Label(
@@ -100,6 +106,12 @@ class DisplayPanel(tk.Frame):
             padx=name_padx,
             pady=name_pady
         )
+        
+        # Bind to resize events
+        self.bind("<Configure>", self.on_resize)
+        
+        # Initialize size to fit text
+        self.after(10, self.adjust_font_size)
 
     def update_value(self, new_value):
         """
@@ -109,6 +121,7 @@ class DisplayPanel(tk.Frame):
             text=f"{new_value}{(' ' + self.unit) if self.unit else ''}",
             fg=self.get_value_color(new_value)
         )
+        self.adjust_font_size()
 
     def get_value_color(self, val):
         """
@@ -145,6 +158,77 @@ class DisplayPanel(tk.Frame):
                 return COLORS['accent_normal']
                 
         return COLORS['accent_normal']
+        
+    def on_resize(self, event=None):
+        """Handle resize events to adjust font size"""
+        self.adjust_font_size()
+    
+    def adjust_font_size(self):
+        """
+        Adjust font size to fit the panel size while maximizing use of space
+        """
+        if not hasattr(self, 'value_label') or not hasattr(self, 'name_label'):
+            return
+            
+        # Get panel dimensions
+        panel_width = self.winfo_width()
+        panel_height = self.winfo_height()
+        
+        if panel_width <= 1 or panel_height <= 1:
+            # Widget not fully initialized yet
+            return
+            
+        # Start with initial font sizes
+        family_val, size_val, weight_val = self.initial_font_value
+        family_name, size_name = self.initial_font_name[0], self.initial_font_name[1]
+        weight_name = self.initial_font_name[2] if len(self.initial_font_name) > 2 else "normal"
+        
+        # Get text content
+        value_text = self.value_label['text']
+        name_text = self.name_label['text']
+        
+        # Calculate available space (account for padding)
+        if isinstance(self.value_pady, tuple):
+            value_pady_total = self.value_pady[0] + self.value_pady[1]
+        else:
+            value_pady_total = self.value_pady * 2
+            
+        if isinstance(self.name_pady, tuple):
+            name_pady_total = self.name_pady[0] + self.name_pady[1]
+        else:
+            name_pady_total = self.name_pady * 2
+            
+        available_height = panel_height - value_pady_total - name_pady_total
+        available_width = panel_width - self.value_padx * 2
+        
+        # Reserve space for both labels (60% for value, 40% for name)
+        value_height = available_height * 0.6
+        name_height = available_height * 0.4
+        
+        # Find optimal font size - start with a large size and decrease until it fits
+        # For value label
+        new_size_val = size_val
+        while new_size_val > 8:  # Minimum readable font size
+            test_font = (family_val, new_size_val, weight_val)
+            self.value_label.config(font=test_font)
+            self.update_idletasks()
+            if self.value_label.winfo_reqwidth() <= available_width and self.value_label.winfo_reqheight() <= value_height:
+                break
+            new_size_val -= 1
+        
+        # For name label
+        new_size_name = size_name
+        while new_size_name > 6:  # Minimum readable font size
+            test_font = (family_name, new_size_name, weight_name)
+            self.name_label.config(font=test_font)
+            self.update_idletasks()
+            if self.name_label.winfo_reqwidth() <= available_width and self.name_label.winfo_reqheight() <= name_height:
+                break
+            new_size_name -= 1
+        
+        # Save the new font configurations
+        self.font_value = (family_val, new_size_val, weight_val)
+        self.font_name = (family_name, new_size_name, weight_name)
 
 # --------------------------------------------------------------------------
 # PanelGroup
@@ -551,6 +635,7 @@ class Display(tk.Tk):
         container.place(relx=0.5, rely=0.5, anchor="center")
         
         buttons = []
+        frames = []  # Store frames for highlighting
         
         # Menu options based on the diagram
         menu_options = [
@@ -578,6 +663,7 @@ class Display(tk.Tk):
         for i, (text, action) in enumerate(zip(menu_options, actions)):
             highlight_frame = tk.Frame(container, bg=COLORS["menu_bg"], bd=2)
             highlight_frame.pack(pady=10)
+            frames.append(highlight_frame)
             
             button = tk.Button(
                 highlight_frame,
@@ -586,7 +672,7 @@ class Display(tk.Tk):
                 fg="#ffffff",
                 bg="#333333",
                 activebackground="#444444",
-                width=30,
+                width=35,
                 borderwidth=0,
                 command=action
             )
@@ -612,6 +698,7 @@ class Display(tk.Tk):
         # Add back button
         highlight_frame = tk.Frame(container, bg=COLORS["menu_bg"], bd=2)
         highlight_frame.pack(pady=10)
+        frames.append(highlight_frame)
         
         back_button = tk.Button(
             highlight_frame,
@@ -629,6 +716,11 @@ class Display(tk.Tk):
         self.button8 = back_button
         
         self.main_menu_button_list = buttons
+        self.main_menu_frames = frames
+        self.active_button = 0  # Initialize first button as active
+        
+        # Highlight the first button
+        self._highlight_main_menu_button(0)
         
         return container
 
@@ -679,20 +771,20 @@ class Display(tk.Tk):
         # Create telemetry panels on the right using PanelGroup
         telemetry_panels = [
             [{"id": "Accu Temp", "name": "Accu Temp", "font_value": ("Segoe UI", 36, "bold"), 
-              "bg_color": COLORS["panel_active"], "width": 200, "height": 100}],
+              "bg_color": COLORS["panel_bg"], "width": 200, "height": 100}],
             [{"id": "Lowest Cell", "name": "Lowest Cell", "font_value": ("Segoe UI", 36, "bold"),
-              "bg_color": COLORS["panel_active"], "width": 200, "height": 100}],
+              "bg_color": COLORS["panel_bg"], "width": 200, "height": 100}],
             [
                 [{"id": "Inverter L Temp", "name": "Inverter L Temp", "font_value": ("Segoe UI", 24, "bold"),
-                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}],
+                 "bg_color": COLORS["panel_bg"], "width": 100, "height": 100}],
                 [{"id": "Inverter R Temp", "name": "Inverter R Temp", "font_value": ("Segoe UI", 24, "bold"),
-                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}]
+                 "bg_color": COLORS["panel_bg"], "width": 100, "height": 100}]
             ],
             [
                 [{"id": "Motor L Temp", "name": "Motor L Temp", "font_value": ("Segoe UI", 24, "bold"),
-                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}],
+                 "bg_color": COLORS["panel_bg"], "width": 100, "height": 100}],
                 [{"id": "Motor R Temp", "name": "Motor R Temp", "font_value": ("Segoe UI", 24, "bold"),
-                 "bg_color": COLORS["panel_active"], "width": 100, "height": 100}]
+                 "bg_color": COLORS["panel_bg"], "width": 100, "height": 100}]
             ]
         ]
         
@@ -902,14 +994,14 @@ class Display(tk.Tk):
                  "font_name": ("Segoe UI", 36),
                  "value_pady": (13, 0),
                  "width": 400, "height": 150,
-                 "bg_color": COLORS["panel_active"]},
+                 "bg_color": COLORS["panel_bg"]},
                 
                 # Lowest Cell panel (bottom left)
                 {"id": "Lowest Cell", "name": "Lowest Cell",
                  "font_value": ("Segoe UI", 46, "bold"),
                  "font_name": ("Segoe UI", 22),
                  "value_pady": (20, 0),
-                 "bg_color": COLORS["panel_active"]}
+                 "bg_color": COLORS["panel_bg"]}
             ],
             "right": [
                 # Top right panels (TC, TV, Max Torque)
@@ -934,7 +1026,7 @@ class Display(tk.Tk):
                      "font_value": ("Segoe UI", 36, "bold"),
                      "font_name": ("Segoe UI", 12),
                      "colspan": 2,
-                     "bg_color": COLORS["panel_active"]}
+                     "bg_color": COLORS["panel_bg"]}
                 ],
                 
                 # Temperature grid (bottom right)
@@ -942,19 +1034,19 @@ class Display(tk.Tk):
                     [{"id": "Motor L Temp", "name": "Motor L Temp",
                       "font_value": ("Segoe UI", 28, "bold"),
                       "font_name": ("Segoe UI", 12),
-                      "bg_color": COLORS["panel_active"]},
+                      "bg_color": COLORS["panel_bg"]},
                      {"id": "Motor R Temp", "name": "Motor R Temp",
                       "font_value": ("Segoe UI", 28, "bold"),
                       "font_name": ("Segoe UI", 12),
-                      "bg_color": COLORS["panel_active"]}],
+                      "bg_color": COLORS["panel_bg"]}],
                     [{"id": "Inverter L Temp", "name": "Inverter L Temp",
                       "font_value": ("Segoe UI", 28, "bold"),
                       "font_name": ("Segoe UI", 12),
-                      "bg_color": COLORS["panel_active"]},
+                      "bg_color": COLORS["panel_bg"]},
                      {"id": "Inverter R Temp", "name": "Inverter R Temp",
                       "font_value": ("Segoe UI", 28, "bold"),
                       "font_name": ("Segoe UI", 12),
-                      "bg_color": COLORS["panel_active"]}]
+                      "bg_color": COLORS["panel_bg"]}]
                 ]
             ]
         }
@@ -989,13 +1081,13 @@ class Display(tk.Tk):
                       "font_value": ("Segoe UI", 42, "bold"),
                       "font_name": ("Segoe UI", 22),
                       "value_pady": (20, 0),
-                      "bg_color": COLORS["panel_active"]},
+                      "bg_color": COLORS["panel_bg"]},
                      {"id": "Accu Temp", "name": "Accu Temp",
                       "font_value": ("Segoe UI", 42, "bold"),
                       "font_name": ("Segoe UI", 22),
                       "value_pady": (20, 0),
                       "value_padx": 37,
-                      "bg_color": COLORS["panel_active"]}]
+                      "bg_color": COLORS["panel_bg"]}]
                 ],
                 
                 # Temperature grid (bottom right)
@@ -1004,22 +1096,22 @@ class Display(tk.Tk):
                       "font_value": ("Segoe UI", 32, "bold"),
                       "font_name": ("Segoe UI", 16),
                       "value_pady": (10, 0),
-                      "bg_color": COLORS["panel_active"]},
+                      "bg_color": COLORS["panel_bg"]},
                      {"id": "Motor R Temp", "name": "Motor R Temp",
                       "font_value": ("Segoe UI", 32, "bold"),
                       "font_name": ("Segoe UI", 16),
                       "value_pady": (10, 0),
-                      "bg_color": COLORS["panel_active"]}],
+                      "bg_color": COLORS["panel_bg"]}],
                     [{"id": "Inverter L Temp", "name": "Inverter L Temp",
                       "font_value": ("Segoe UI", 32, "bold"),
                       "font_name": ("Segoe UI", 16),
                       "value_pady": (10, 0),
-                      "bg_color": COLORS["panel_active"]},
+                      "bg_color": COLORS["panel_bg"]},
                      {"id": "Inverter R Temp", "name": "Inverter R Temp",
                       "font_value": ("Segoe UI", 32, "bold"),
                       "font_name": ("Segoe UI", 16),
                       "value_pady": (10, 0),
-                      "bg_color": COLORS["panel_active"]}]
+                      "bg_color": COLORS["panel_bg"]}]
                 ]
             ]
         }
@@ -1049,7 +1141,7 @@ class Display(tk.Tk):
 
     def _highlight_main_menu_button(self, button_index):
         """Highlight a specific button in the menu"""
-        # Reset all buttons to default
+        # Reset all frames to default
         for frame in self.main_menu_frames:
             frame.config(bg=COLORS["menu_bg"])
             
