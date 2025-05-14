@@ -1,0 +1,1126 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: SWU CCU None Inverter DTU FSGlogger ASSU ASPU Kistler RES ASCU SEN PDU DRS DIU AMS VCU FS_Datalogger
+VAL_TABLE_ DTU_ErrorCode 42 "HOSTPROT_ERROR_QUEUE_FULL" 41 "HOSTPROT_CMD_QUEUE_FULL" 40 "HOSTPROT_TX_CAN_QUEUE_FULL" 39 "HOSTPROT_INVALID_HOST_PACKET_ID" 38 "HOST_IF_RX_SIZE_OVER_EP_SIZE" 37 "HOST_IF_TX_QUEUE_FULL" 36 "CAN_REDUNDANCY_GET_ID_OOB" 35 "CAN_REDUNDANCY_CHECK_ID_OOB" 34 "CAN_BUS_IT_ERROR" 33 "CAN_BUS_ARRAY2MSG_LEN_ERROR" 32 "CAN_BUS_ARRAY2MSG_LEN_OOB" 31 "CAN_BUS_LOGGING_OVERLOAD" 30 "CAN_BUS_CONTROL_OVERLOAD" 29 "CAN_BUS_HOST_IF_OVERLOAD" 28 "CAN_BUS_INIT_FAILED" 27 "CODEC_FRAME_SIZE_ZERO" 26 "CODEC_FEC_SIZE_INCONSISTENCY" 25 "CODEC_DEC_SIZE_INCONSISTENCY" 24 "CODEC_ENC_SIZE_INCONSISTENCY" 23 "CODEC_DEC_INIT_SIZE_OVER_MAX" 22 "CODEC_ENC_INIT_SIZE_OVER_MAX" 21 "CODEC_DECODER_OPUS_INIT_FAIL" 20 "CODEC_ENCODER_OPUS_INIT_FAIL" 19 "SAMPLING_TIMER_START_FAILED" 18 "DAC_HAL_ERROR" 17 "DAC_HW_INIT_FAILED" 16 "ADC_HAL_ERROR" 15 "ADC_HW_INIT_FAILED" 14 "MIC_DETECTION_TIMER_FAILED" 13 "SETTINGS_TIMEOUT_START_HAL_FAIL" 12 "SETTINGS_RX_RECONF_FREQUENTLY" 11 "SETTINGS_EE_FORMAT_FAILED" 10 "SETTINGS_EE_READ_FAILED" 9 "SETTINGS_EE_WRITE_FAILED" 8 "SETTINGS_EE_INIT_FAILED" 7 "DTUPROT_COMPR_CAN_NO_ENTRY" 6 "DTUPROT_COMPR_CAN_FROM_STATION" 5 "DTUPROT_CAN_PACKET_OVER_MAX_LEN" 4 "RF_INCORRECT_IRQ_FLAGS" 3 "RF_TX_PAYLOAD_OVER_MAX_LEN" 2 "RF_SPI_TRANSM_START_FAILED" 1 "RF_SPI_HAL_ERROR_CB" 0 "RF_HW_INIT_FAILED" ;
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ CANopen_Subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ DIU_Heartbeat : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1088 DTU_ErrorCode: 1 DTU
+ SG_ DTU_ErrorCode : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 41 DTU_Heartbeat_Station: 1 Vector__XXX
+
+BO_ 40 DTU_Heartbeat_Car: 1 DTU
+
+BO_ 753 SWU_Switch_States: 4 SWU
+ SG_ SWU_Switch_reserved : 20|12@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Switch_5 : 16|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Switch_4 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Switch_3 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Switch_2 : 4|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Switch_1 : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 752 SWU_Button_States: 1 SWU
+ SG_ SWU_Button_8_Up_DRS : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_6_9_Down_RadioActive : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_6_R2D : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_5_TS_On : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_4_Overall_Reset : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_3_Cooling : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_2_OK : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ SWU_Button_1_Menu : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 386 Inverter_R_Tx: 8 Vector__XXX
+
+BO_ 514 Inverter_R_Rx: 8 Vector__XXX
+
+BO_ 939 VCU_Laptrigger: 1 Vector__XXX
+ SG_ vcu_laptrigger_flag : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 579 AMS_SOC: 8 Vector__XXX
+ SG_ AMS_SOC_Wh_since_last_calib : 16|32@1- (1,0) [0|0] "Wh" Vector__XXX
+ SG_ AMS_SOC_percentage_from_volt : 8|8@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ AMS_SOC_percentage : 0|8@1+ (1,0) [0|0] "%" Vector__XXX
+
+BO_ 911 PDU_Faults: 4 Vector__XXX
+ SG_ PDU_Fault_R2D : 22|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_VLU : 21|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_InverterR : 20|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_DIU : 19|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_RES : 18|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_ASMS : 17|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_Waterpump : 16|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_ASPU : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_ASCU : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_DTU : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_CoolingFanR : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_CoolingFanL : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_DRS : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_SEN : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_BLRed : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_SteeringActuator : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_VCU : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_SWU : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_InverterL : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_CAN_LOGGER : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_LIDAR : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_Kistler : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_Fault_BLBlue : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 901 PDU_I_WPump_VLU_DRS: 8 Vector__XXX
+ SG_ PDU_I_mA_DRS : 32|12@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_VLU : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_WATERPUMP : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_reserved : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1002 ASPU_System_Info: 3 ASPU
+ SG_ ASPU_Core_Speed_Average : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASPU_Package_Temp : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1001 ASPU_Vehicle_Data: 6 ASPU
+ SG_ ASPU_Mission_Distance_in_mm : 16|32@1+ (1,0) [0|0] "mm" Vector__XXX
+ SG_ ASPU_Abs_Speed_KMH100 : 0|16@1+ (1,0) [0|0] "KHM/100" Vector__XXX
+
+BO_ 950 CANID_VCU_Inverter_Voltages: 6 Vector__XXX
+ SG_ VCU_Inverter_Vemf : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Inverter_V_Q : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Inverter_V_D : 16|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 991 CANID_VCU_Debug_Variables: 8 Vector__XXX
+ SG_ VCU_Debug_04 : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Debug_03 : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Debug_02 : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Debug_01 : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 944 VCU_Inverter_status_register: 4 Vector__XXX
+ SG_ VCU_Inverter_Status_Bits : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 38 MCU_DRS_Heartbeat: 1 Vector__XXX
+ SG_ MCU_DRS_Heartbeat : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 705 MCU_DRS_DIU_Information: 2 Vector__XXX
+ SG_ MCU_DRS_FSM_Mode_Selection_sate : 2|4@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_BLDC_Temperature : 6|8@1+ (1,0) [0|0] " C" Vector__XXX
+ SG_ MCU_DRS_position_state : 0|2@1+ (1,0) [0|0] "unitless" Vector__XXX
+
+BO_ 1076 MCU_DRS_Telemetry_3: 5 Vector__XXX
+ SG_ MCU_DRS_reference_switch_state : 32|2@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_VCU_alive_heartbeat : 20|1@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_Track_Mode_state : 9|5@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_position_state : 30|2@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_Pit_Mode_state : 14|4@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_PID_Enable : 19|1@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_FSM_Mode_Selection_sate : 0|4@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_FSM_Calibration_state : 4|5@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_Encoder_Mode : 18|1@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_DIU_alive_heartbeat : 21|1@1+ (1,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_BLDC_Temperature : 22|8@1+ (1,0) [0|0] " C" Vector__XXX
+
+BO_ 1075 MCU_DRS_Telemetry_2: 8 Vector__XXX
+ SG_ MCU_DRS_Integral_Pos_Control : 48|16@1- (0.0001,0) [0|0] "unitless" Vector__XXX
+ SG_ MCU_DRS_dest_BLDC_position : 16|16@1- (0.0001,0) [0|0] "Normalized" Vector__XXX
+ SG_ MCU_DRS_BLDC_Speed : 32|16@1- (0.0001,0) [0|0] "Normalized" Vector__XXX
+ SG_ MCU_DRS_actual_BLDC_position : 0|16@1- (0.0001,0) [0|0] "Normalized" Vector__XXX
+
+BO_ 1074 MCU_DRS_Telemetry_1: 8 Vector__XXX
+ SG_ MCU_DRS_ADC4_CHANNEL_BLDC_TEMP : 54|10@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ MCU_DRS_ADC3_CHANNEL_5V : 44|10@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ MCU_DRS_ADC3_CHANNEL_BLDC_20V : 32|12@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ MCU_DRS_ADC3_CHANNEL_PVCC : 20|12@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ MCU_DRS_ADC3_CHANNEL_SW_BK_5V : 10|10@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ MCU_DRS_ADC3_CHANNEL_AVDD_3V3 : 0|10@1+ (0.01,0) [0|0] "V" Vector__XXX
+
+BO_ 1309 MCU_DRS_Software_Version: 2 Vector__XXX
+ SG_ MCU_DRS_Software_Version : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147483648 VECTOR__INDEPENDENT_SIG_MSG: 8 Vector__XXX
+ SG_ ASSU_SDO_Rx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Rx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Rx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Rx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Tx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Tx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Tx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_SDO_Tx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASPU_EBS_Pressure_Front_BP1 : 0|16@1+ (0.1,0) [0|0] "bar/10" Vector__XXX
+ SG_ ASPU_EBS_Pressure_Rear_BP2 : 0|16@1+ (0.1,0) [0|0] "bar/10" Vector__XXX
+ SG_ ASPU_Brake_Pressure_Front_BP3 : 0|16@1+ (0.1,0) [0|0] "bar/10" Vector__XXX
+ SG_ ASPU_Brake_Pressure_Rear_BP4 : 0|16@1+ (0.1,0) [0|0] "bar/10" Vector__XXX
+ SG_ AMS_Cell_V_103 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_102 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_101 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_100 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_099 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_098 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_097 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_096 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_111 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_110 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_109 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_108 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_107 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_106 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_105 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_104 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_119 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_118 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_117 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_116 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_115 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_114 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_113 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_112 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_127 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_126 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_125 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_124 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_123 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_122 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_121 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_120 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Temp_007 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_006 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_005 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_004 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_003 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_002 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_001 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_000 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_015 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_014 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_013 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_012 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_011 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_010 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_009 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_008 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_023 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_022 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_021 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_020 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_019 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_018 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_017 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_016 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_031 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_030 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_029 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_028 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_027 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_026 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_025 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_024 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_039 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_038 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_037 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_036 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_035 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_034 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_033 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_032 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_047 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_046 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_045 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_044 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_043 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_042 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_041 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_040 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ RES_SDO_Rx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Rx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Rx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Rx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Tx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Tx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Tx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_SDO_Tx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_PDO1_Rx : 0|64@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASSU_PDO1_Tx : 0|64@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Rx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Rx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Rx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Rx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Tx_data : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Tx_subindex : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Tx_index : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RES_PDO1_Tx_command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1435 ASSU_SDO_Tx: 8 ASSU
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1563 ASSU_SDO_Rx: 8 ASCU
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 938 VCU_Sensor_Valid: 1 VCU
+ SG_ VCU_EBS_valid : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Wheelspeed_valid : 1|1@1+ (1,0) [0|0] "bool" Vector__XXX
+ SG_ VCU_steering_valid : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_motorrotation : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_imu_valid : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_brakepressure_valid : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_apps_valid : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 937 VCU_SDC: 3 VCU
+ SG_ VCU_sdc_last_fault_state : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_SDC_before_closed : 1|1@1+ (1,0) [0|0] "bool" Vector__XXX
+ SG_ VCU_SDC_after_closed : 2|1@1+ (1,0) [0|0] "bool" Vector__XXX
+ SG_ VCU_SDC_closed : 0|1@1+ (1,0) [0|0] "bool" Vector__XXX
+
+BO_ 704 MCU_DRS_CALIBRATION_POSITION: 2 Vector__XXX
+ SG_ MCU_DRS_CalibrationPosition : 0|16@1+ (1,0) [0|10000] "" Vector__XXX
+
+BO_ 1073 MCU_DRS_Error_Frame: 1 Vector__XXX
+ SG_ MCU_DRS_Error_Code : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 946 VCU_DRC_2: 8 Vector__XXX
+ SG_ VCU_ZulEntladerate : 32|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_IstEntladerate : 0|32@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 945 VCU_DRC_1: 8 Vector__XXX
+ SG_ VCU_SOC : 32|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_VehVms : 0|32@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 949 VCU_SlipAngleControl_2: 8 Vector__XXX
+ SG_ VCU_Slip_Control_D : 32|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Slip_Control_I : 0|32@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 948 VCU_SlipAngleControl_1: 8 Vector__XXX
+ SG_ VCU_Slip_Control_P : 32|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Actual_Slip : 0|32@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 988 VCU_VectorNAV_IMU_Gyro_1_2: 8 VCU
+ SG_ VCU_VectorNAV_IMU_Gyro_2 : 32|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+ SG_ VCU_VectorNAV_IMU_Gyro_1 : 0|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 987 VCU_VectorNAV_IMU_Accel_2_Gyro_0: 8 VCU
+ SG_ VCU_VectorNAV_IMU_Gyro_0 : 32|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+ SG_ VCU_VectorNAV_IMU_Accel_2 : 0|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+
+BO_ 986 VCU_VectorNAV_IMU_Accel_0_1: 8 VCU
+ SG_ VCU_VectorNAV_IMU_Accel_1 : 32|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+ SG_ VCU_VectorNAV_IMU_Accel_0 : 0|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+
+BO_ 985 VCU_VectorNAV_Accel_1_2: 8 VCU
+ SG_ VCU_VectorNAV_Accel_2 : 32|32@1- (1,0) [0|0] "m/s" Vector__XXX
+ SG_ VCU_VectorNAV_Accel_1 : 0|32@1- (1,0) [0|0] "m/s" Vector__XXX
+
+BO_ 984 VCU_VectorNAV_Velocity_2_Accel_0: 8 VCU
+ SG_ VCU_VectorNAV_Accel_0 : 32|32@1- (1,0) [0|0] "m/s" Vector__XXX
+ SG_ VCU_VectorNAV_Velocity_2 : 0|32@1- (1,0) [0|0] "m/s" Vector__XXX
+
+BO_ 983 VCU_VectorNAV_Velocity_0_1: 8 VCU
+ SG_ VCU_VectorNAV_Velocity_1 : 32|32@1- (1,0) [0|0] "m/s" Vector__XXX
+ SG_ VCU_VectorNAV_Velocity_0 : 0|32@1- (1,0) [0|0] "m/s" Vector__XXX
+
+BO_ 979 VCU_VectorNAV_Angular_1_2: 8 VCU
+ SG_ VCU_VectorNAV_Angular_2 : 32|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+ SG_ VCU_VectorNAV_Angular_1 : 0|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 978 VCU_VectorNAV_Roll_Angular_0: 8 VCU
+ SG_ VCU_VectorNAV_Angular_0 : 32|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+ SG_ VCU_VectorNAV_Roll_ : 0|32@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 977 VCU_VectorNAV_Yaw_Pitch: 8 VCU
+ SG_ VCU_VectorNAV_Pitch : 32|32@1- (1,0) [0|0] "degree" Vector__XXX
+ SG_ VCU_VectorNAV_Yaw : 0|32@1- (1,0) [0|0] "degree" Vector__XXX
+
+BO_ 578 AMS_Balancing_Status: 1 Vector__XXX
+ SG_ AMS_FSM_Balancing_Status : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 810 Laptop_Balancing: 4 Vector__XXX
+ SG_ Laptop_Balancing_Voltage : 8|16@1+ (0.0001,0) [3.01|4.28] "" Vector__XXX
+ SG_ Laptop_Balancing_Status : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Laptop_Balancing_Current_PWM : 24|8@1+ (1,0) [0|100] "%" Vector__XXX
+
+BO_ 936 VCU_Requested_Torque_Percentage: 8 Vector__XXX
+ SG_ VCU_Inverter_actual_torque : 48|16@1- (1,0) [0|1000] "" Vector__XXX
+ SG_ VCU_nm_max : 32|16@1- (1,0) [0|1000] "Nm" Vector__XXX
+ SG_ VCU_torque_simulink : 16|16@1- (0.1,0) [0|0] "%" Vector__XXX
+ SG_ VCU_torque_percentage : 0|16@1- (-1,0) [0|1000] "%" Vector__XXX
+
+BO_ 887 CCU_setHVParameter: 4 Vector__XXX
+ SG_ CCU_HV_PS_setVoltage : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CCU_HV_PS_setCurrent : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 39 CCU_Heartbeat: 1 CCU
+ SG_ CCU_Heartbeat : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 886 CCU_Software_Version: 2 Vector__XXX
+ SG_ CCU_Software_Version : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 882 CCU_HV_PS_parameters: 4 Vector__XXX
+ SG_ CCU_HV_PS_Voltage : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CCU_HV_PS_Current : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 657 ASPU_Drive_Commands: 6 ASPU
+ SG_ ASPU_Velocity_Target : 32|16@1- (1,0) [0|0] ""  VCU
+ SG_ ASPU_Steering_Angle_Target : 16|16@1- (1,0) [0|0] "degree"  VCU
+ SG_ ASPU_Speed_Control_Setpoint : 0|16@1- (1,0) [0|0] ""  VCU
+
+BO_ 819 AMS_Cell_V_001_008: 8 AMS
+ SG_ AMS_Cell_V_007 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_006 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_005 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_004 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_003 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_002 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_001 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_000 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 820 AMS_Cell_V_009_016: 8 AMS
+ SG_ AMS_Cell_V_015 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_014 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_013 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_012 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_011 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_010 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_009 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_008 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 821 AMS_Cell_V_017_024: 8 AMS
+ SG_ AMS_Cell_V_023 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_022 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_021 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_020 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_019 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_018 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_017 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_016 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 822 AMS_Cell_V_025_032: 8 AMS
+ SG_ AMS_Cell_V_031 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_030 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_029 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_028 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_027 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_026 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_025 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_024 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 823 AMS_Cell_V_033_040: 8 AMS
+ SG_ AMS_Cell_V_039 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_038 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_037 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_036 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_035 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_034 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_033 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_032 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 824 AMS_Cell_V_041_048: 8 AMS
+ SG_ AMS_Cell_V_047 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_046 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_045 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_044 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_043 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_042 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_041 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_040 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 825 AMS_Cell_V_049_056: 8 AMS
+ SG_ AMS_Cell_V_055 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_054 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_053 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_052 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_051 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_050 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_049 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_048 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 826 AMS_Cell_V_057_064: 8 AMS
+ SG_ AMS_Cell_V_063 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_062 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_061 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_060 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_059 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_058 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_057 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_056 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 827 AMS_Cell_V_065_072: 8 AMS
+ SG_ AMS_Cell_V_071 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_070 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_069 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_068 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_067 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_066 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_065 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_064 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 828 AMS_Cell_V_073_080: 8 AMS
+ SG_ AMS_Cell_V_079 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_078 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_077 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_076 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_075 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_074 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_073 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_072 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 829 AMS_Cell_V_081_088: 8 AMS
+ SG_ AMS_Cell_V_087 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_086 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_085 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_084 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_083 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_082 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_081 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_080 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 830 AMS_Cell_V_089_096: 8 AMS
+ SG_ AMS_Cell_V_095 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_094 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_093 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_092 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_091 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_090 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_089 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_088 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 1072 FSG_Datalogger_Status: 6 FS_Datalogger
+ SG_ FSG_Current : 32|16@1+ (64,0) [0|4194240] "mA" Vector__XXX
+ SG_ FSG_Voltage : 16|16@1+ (16,0) [0|1048560] "mV" Vector__XXX
+ SG_ FSG_Status_Triggered_Current : 11|1@1- (1,0) [0|0] "" Vector__XXX
+ SG_ FSG_Status_Triggered_Voltage : 10|1@1- (1,0) [0|0] "" Vector__XXX
+ SG_ FSG_Status_Logging : 9|1@1- (1,0) [0|0] "" Vector__XXX
+ SG_ FSG_Status_Ready : 8|1@1- (1,0) [0|0] "" Vector__XXX
+ SG_ FSG_MsgCnt : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 831 AMS_Cell_V_097_104: 8 AMS
+ SG_ AMS_Cell_V_103 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_102 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_101 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_100 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_099 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_098 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_097 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_096 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 832 AMS_Cell_V_105_112: 8 AMS
+ SG_ AMS_Cell_V_111 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_110 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_109 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_108 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_107 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_106 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_105 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_104 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 833 AMS_Cell_V_113_120: 8 AMS
+ SG_ AMS_Cell_V_119 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_118 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_117 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_116 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_115 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_114 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_113 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_112 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 834 AMS_Cell_V_121_126: 8 AMS
+ SG_ AMS_Cell_V_127 : 56|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_126 : 48|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_125 : 40|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_124 : 32|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_123 : 24|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_122 : 16|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_121 : 8|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+ SG_ AMS_Cell_V_120 : 0|8@1+ (0.01,2.5) [2.5|5.05] "V" Vector__XXX
+
+BO_ 835 AMS_Temp_001_008: 8 AMS
+ SG_ AMS_Temp_007 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_006 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_005 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_004 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_003 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_002 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_001 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_000 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 836 AMS_Temp_009_016: 8 AMS
+ SG_ AMS_Temp_015 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_014 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_013 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_012 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_011 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_010 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_009 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_008 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 837 AMS_Temp_017_024: 8 AMS
+ SG_ AMS_Temp_023 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_022 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_021 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_020 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_019 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_018 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_017 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_016 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 838 AMS_Temp_025_032: 8 AMS
+ SG_ AMS_Temp_031 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_030 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_029 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_028 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_027 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_026 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_025 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_024 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 839 AMS_Temp_033_040: 8 AMS
+ SG_ AMS_Temp_039 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_038 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_037 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_036 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_035 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_034 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_033 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_032 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 840 AMS_Temp_041_048: 8 AMS
+ SG_ AMS_Temp_047 : 56|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_046 : 48|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_045 : 40|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_044 : 32|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_043 : 24|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_042 : 16|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_041 : 8|8@1+ (1,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_Temp_040 : 0|8@1+ (1,0) [15|65] "degC" Vector__XXX
+
+BO_ 841 AMS_Error_Msg: 3 AMS
+ SG_ AMS_UV_Cell : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_OV_Cell : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Error : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 818 AMS_TS_Data: 7 AMS
+ SG_ AMS_SOC : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_TS_Voltage_Carside : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_TS_Current : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 817 AMS_Periphery: 7 AMS
+ SG_ AMS_TS_Activation_Status_FSM : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Shunt_Current : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_IMD_Resistance : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_IMD_Current : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 816 AMS_Fan_Status: 5 AMS
+ SG_ AMS_Powerchannel_Fan2_Current : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Powerchannel_Fan1_Current : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Fan_Speed : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1303 AMS_Software_Version: 2 AMS
+ SG_ AMS_Software_Version : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 577 AMS_Fuses: 2 AMS
+ SG_ AMS_Shunt_Slowfuse : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Shunt_Fastfuse : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_IMD_Slowfuse : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_IMD_Fastfuse : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Fan2_Slowfuse : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Fan2_Fastfuse : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Fan1_Slowfuse : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Fan1_Fastfuse : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_DCDC_Slowfuse : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_DCDC_Fastfuse : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 576 AMS_Accustatus: 8 AMS
+ SG_ AMS_lowerst_Cell_V : 0|16@1+ (0.0001,0) [3|4.28] "V" Vector__XXX
+ SG_ AMS_highest_Cell_V : 16|16@1+ (0.0001,0) [3|4.28] "V" Vector__XXX
+ SG_ AMS_highest_Cell_temp : 32|16@1+ (0.01,0) [15|65] "degC" Vector__XXX
+ SG_ AMS_TS_Voltage_TSAC : 48|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 34 AMS_Control: 1 AMS
+ SG_ AMS_TS_Status : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Status_SDC : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_SDC_Closed : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_IMD_Status_SDC : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMS_Heartbeat : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 866 AMS_IVT_Msg_Response: 8 Vector__XXX
+
+BO_ 865 AMS_IVT_Msg_Debug: 8 Vector__XXX
+
+BO_ 864 AMS_IVT_Msg_Command: 7 Vector__XXX
+ SG_ IVT_Serial_Number_H18 : 24|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_CAN_ID_H18 : 8|11@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 874 AMS_IVT_Msg_Result_Wh: 6 Vector__XXX
+ SG_ IVT_Result_Wh_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 872 AMS_IVT_Msg_Result_W: 6 Vector__XXX
+ SG_ IVT_Result_W_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 870 AMS_IVT_Msg_Result_U3: 6 Vector__XXX
+ SG_ IVT_Result_U3_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 869 AMS_IVT_Msg_Result_U2: 6 Vector__XXX
+ SG_ IVT_Result_U2_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 868 AMS_IVT_Msg_Result_U1: 6 Vector__XXX
+ SG_ IVT_Result_U1_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 871 AMS_IVT_Msg_Result_T: 6 Vector__XXX
+ SG_ IVT_Result_T_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 867 AMS_IVT_Msg_Result_I: 6 Vector__XXX
+ SG_ IVT_Result_I_H18 : 16|32@1- (0.001,0) [0|0] "A" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 873 AMS_IVT_Msg_Result_As: 6 Vector__XXX
+ SG_ IVT_Result_As_H18 : 16|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MuxID_H18 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_MsgCount_H18 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT__Resulte_state_H18 : 12|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2021 CANopen_LSS_Rx: 8 None
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2020 CANopen_LSS_Tx: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1819 ASSU_Heartbeat: 1 ASSU
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1809 RES_Heartbeat: 1 RES
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1308 DIU_Software_Version: 2 DIU
+
+BO_ 1553 RES_SDO_Rx: 8 None
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1425 RES_SDO_Tx: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1298 ASCU_SCS_AS: 2 ASCU
+ SG_ ASCU_SCS_VCU_Heartbeat : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_SCS_AS_Okay : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_SCS_ASPU_Heartbeat : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_SCS_RES_Status : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1282 ASPU_DV_system_status: 5 ASPU
+ SG_ ASPU_AS_state : 0|3@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_EBS_state : 3|2@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_AMI_state : 5|3@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_Steering_state : 8|1@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_Service_brake_state : 9|2@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_Lap_counter : 11|4@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_Cones_count_actual : 15|8@1+ (1,0) [0|0] ""  FSGlogger
+ SG_ ASPU_Cones_count_all : 23|17@1+ (1,0) [0|0] ""  FSGlogger
+
+BO_ 935 VCU_Debug_Set_Rotationspeed: 8 VCU
+
+BO_ 562 ASSU_PDO1_Rx: 8 VCU
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 545 ASSU_PDO1_Tx: 8 ASSU
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 529 RES_PDO1_Rx: 8 None
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 513 Inverter_L_Rx: 8 VCU
+
+BO_ 401 RES_PDO1_Tx: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 385 Inverter_L_Tx: 8 Inverter
+
+BO_ 256 CANopen_TimeStamp: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 155 ASSU_Emergency: 3 ASSU
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 145 RES_Emergency: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 128 CANopen_Sync: 8 RES
+ SG_ CANopen_Subindex : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Index : 8|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Data : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CANopen_Command : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 32 PDU_Heartbeat: 1 PDU
+ SG_ PDU_Heartbeat : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1307 VCU_Software_Version: 2 VCU
+
+BO_ 1281 ASPU_DV_driving_dynamics2: 6 ASPU
+ SG_ ASPU_acceleration_longitudinal : 0|16@1- (0.00195313,0) [0|0] "m/s2"  FSGlogger
+ SG_ ASPU_acceleration_lateral : 16|16@1- (0.00195313,0) [0|0] "m/s2"  FSGlogger
+ SG_ ASPU_yaw_rate : 32|16@1- (0.0078125,0) [0|0] "degree/s"  FSGlogger
+
+BO_ 1280 ASPU_DV_driving_dynamics1: 8 ASPU
+ SG_ ASPU_speed_actual : 0|8@1+ (1,0) [0|0] "km/h"  FSGlogger
+ SG_ ASPU_speed_target : 8|8@1+ (1,0) [0|0] "km/h"  FSGlogger
+ SG_ ASPU_steering_angle_actual : 16|8@1- (0.5,0) [0|0] "degree"  FSGlogger
+ SG_ ASPU_steering_angle_target : 24|8@1- (0.5,0) [0|0] "degree"  FSGlogger
+ SG_ ASPU_brake_hydr_actual : 32|8@1+ (1,0) [0|0] "%"  FSGlogger
+ SG_ ASPU_brake_hydr_target : 40|8@1+ (1,0) [0|0] "%"  FSGlogger
+ SG_ ASPU_motor_moment_actual : 48|8@1- (1,0) [0|0] "%"  FSGlogger
+ SG_ ASPU_motor_moment_target : 56|8@1- (1,0) [0|0] "%"  FSGlogger
+
+BO_ 642 VCU_DRS_Control: 2 VCU
+ SG_ VCU_DRS_position_percentage : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 643 VCU_PDU_Control: 2 VCU
+ SG_ VCU_waterpump_speed : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_r2d_sound_active : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_cooling_system_active : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_brakelight_active : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 640 VCU_Control: 2 VCU
+ SG_ VCU_steering_fault : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_steering_enabled : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_vehicle_state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_R2D_active : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 934 VCU_Inverter_status: 8 VCU
+ SG_ VCU_Inverter_rotation_speed : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Inverter_power : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Inverter_motor_current_eff : 48|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Inverter_motor_voltage : 16|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 933 VCU_Temperatures: 6 VCU
+ SG_ VCU_Temperatures_inverter_igbt : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Temperature_motor : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Temperature_inverter_air : 0|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 930 VCU_Wheelspeed: 8 VCU
+ SG_ VCU_Wheelspeed_rear_right : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Wheelspeed_rear_left : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Wheelspeed_front_right : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_Wheelspeed_front_left : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 928 VCU_APPS_SWA: 8 VCU
+ SG_ VCU_apps_merged : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_swa01 : 48|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_apps02 : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_apps01 : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 929 VCU_BP_EBS: 8 VCU
+ SG_ VCU_ebs_pressure_rear : 48|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ VCU_ebs_pressure_front : 32|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ VCU_brake_pressure_rear : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ VCU_brake_pressure_front : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 641 VCU_DIU_Control: 4 VCU
+
+BO_ 33 VCU_Heartbeat_Mode: 1 VCU
+ SG_ VCU_drivemode : 0|8@1+ (1,0) [0|0] ""  AMS
+
+BO_ 0 CANopen_NMT_node_control: 2 ASCU
+
+BO_ 36 ASPU_Heartbeat: 1 ASPU
+ SG_ ASPU_Heartbeat : 0|8@1+ (1,0) [0|0] ""  ASCU
+
+BO_ 1305 ASPU_Software_Version: 2 ASPU
+ SG_ ASPU_Software_Version : 0|16@1+ (1,0) [0|0] ""  DIU
+
+BO_ 656 ASPU_Control: 2 ASPU
+ SG_ ASPU_Sevice_Brake : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASPU_AMI_Actual : 12|3@1+ (1,0) [0|0] ""  ASCU
+ SG_ ASPU_AS_Error_Types : 0|8@1+ (1,0) [0|0] ""  DIU
+ SG_ ASPU_Mission_Selected : 11|1@1+ (1,0) [0|0] ""  ASCU
+ SG_ ASPU_Vehicle_Standstill : 10|1@1+ (1,0) [0|0] ""  ASCU
+ SG_ ASPU_Mission_Finished : 9|1@1+ (1,0) [0|0] ""  ASCU
+ SG_ ASPU_AS_Okay : 8|1@1+ (1,0) [0|0] ""  ASCU
+
+BO_ 770 Kistler_SF: 8 Kistler
+ SG_ Kistler_StatusByte_2 : 56|8@1+ (1,0) [0|0] ""  ASPU
+ SG_ Kistler_StatusByte_1 : 48|8@1+ (1,0) [0|0] "-"  ASPU
+ SG_ Kistler_LED_Current : 40|8@1+ (0.01,0) [0|0] "A"  ASPU
+ SG_ Kistler_Temperature : 32|8@1- (1,0) [0|0] "C"  ASPU
+ SG_ Kistler_SensorlNum : 24|8@1+ (1,0) [0|0] "-"  ASPU
+ SG_ Kistler_SerialNum : 0|24@1+ (1,0) [0|0] "-"  ASPU
+
+BO_ 769 Kistler_DF2: 6 Kistler
+ SG_ Kistler_Angle : 32|16@1+ (0.01,0) [0|0] "degree"  ASPU
+ SG_ Kistler_Velocity_Transv : 16|16@1- (0.01,0) [0|0] "m/s"  ASPU
+ SG_ Kistler_Velocity_Long : 0|16@1+ (0.01,0) [0|0] "m/s"  ASPU
+
+BO_ 768 Kistler_DF1: 8 Kistler
+ SG_ Kistler_Distance : 32|32@1+ (1,0) [0|0] "mm"  ASPU
+ SG_ Kistler_Abs_Velocity : 16|16@1+ (0.01,0) [0|0] "m/s"  ASPU
+ SG_ Kistler_TimestampMs : 0|16@1+ (0.25,0) [0|0] "ms"  ASPU
+
+BO_ 9 CAN_CONFIG_Response: 8 Vector__XXX
+ SG_ CONFIG_Response : 32|32@1- (1,0) [0|0] "" Vector__XXX
+ SG_ CONFIG_Index : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CONFIG_Device_ID : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CONFIG_Command_ID : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 8 CAN_CONFIG_Query: 4 Vector__XXX
+ SG_ CONFIG_Command_ID : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CONFIG_Index : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ CONFIG_Device_ID : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 7 CAN_CONFIG_Command: 8 Vector__XXX
+ SG_ CONFIG_Argument : 32|32@1- (1,0) [0|0] ""  AMS
+ SG_ CONFIG_Command_ID : 16|16@1+ (1,0) [0|0] ""  AMS
+ SG_ CONFIG_Index : 8|8@1+ (1,0) [0|0] ""  AMS
+ SG_ CONFIG_Device_ID : 0|8@1+ (1,0) [0|0] ""  AMS
+
+BO_ 672 ASCU_Control: 3 ASCU
+ SG_ ASCU_Steering_State : 17|3@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_5s_delay_complete : 16|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_ASMS_Status : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ASCU_TS_On_Button_Request_MHI : 14|1@1+ (1,0) [0|0] ""  AMS
+ SG_ ASCU_Emergency_Sound : 13|1@1+ (1,0) [0|0] ""  PDU
+ SG_ ASCU_EBS_State : 11|2@1+ (1,0) [0|0] ""  VCU
+ SG_ ASCU_EBS_Error_Types : 0|8@1+ (1,0) [0|0] ""  DIU
+ SG_ ASCU_AS_State : 8|3@1+ (1,0) [0|0] ""  VCU
+
+BO_ 1302 DIU_SW_Version_Request: 1 AMS
+ SG_ DIU_SW_Version_Request : 0|8@1+ (1,0) [0|0] ""  VCU
+
+BO_ 1304 PDU_Software_Version: 2 PDU
+ SG_ PDU_Software_Version : 0|16@1+ (1,0) [0|0] ""  DIU
+
+BO_ 906 PDU_Voltages: 8 PDU
+ SG_ PDU_V_mV_12V : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_V_mV_24V : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_V_mV_24V_SDC : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_V_mV_PVcc : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 900 PDU_I_SDC_ASMS_RES_R2D: 8 PDU
+ SG_ PDU_I_mA_R2D : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_RES : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_ASMS : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_SDC : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 899 PDU_I_ASPU_ASCU_SteerAct_DTU: 8 PDU
+ SG_ PDU_I_mA_DTU : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_STEERING_ACTUATOR : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_ASCU : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_ASPU : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 898 PDU_I_VCU_SWU_DIU_SEN: 8 PDU
+ SG_ PDU_I_mA_SEN : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_SWU : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_VCU : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_DIU : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 897 PDU_I_InvL_InvR_CFanL_CFanR: 8 PDU
+ SG_ PDU_I_mA_COOLING_FAN_R : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_COOLING_FAN_L : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_INVERTER_L : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_INVERTER_R : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 896 PDU_I_BLb_Kistler_LiDAR_CANLog: 8 PDU
+ SG_ PDU_I_mA_CAN_LOGGER : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_KISTLER : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_BL_BLUE : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ PDU_I_mA_LIDAR : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1306 ASCU_Software_Version: 2 ASCU
+ SG_ ASCU_SW_Version : 0|16@1+ (1,0) [0|0] ""  DIU
+
+BO_ 1297 ASCU_SCS_EBS: 8 ASCU
+ SG_ ASCU_SCS_ebs_pressure_rear : 48|16@1+ (0.1,0) [0|0] "bar" Vector__XXX
+ SG_ ASCU_SCS_ebs_pressure_front : 32|16@1+ (0.1,0) [0|0] "bar" Vector__XXX
+ SG_ ASCU_SCS_brake_pressure_rear : 16|16@1+ (0.1,0) [0|0] "bar" Vector__XXX
+ SG_ ASCU_SCS_brake_pressure_front : 0|16@1+ (0.1,0) [0|0] "bar" Vector__XXX
+
+BO_ 35 ASCU_Heartbeat: 1 ASCU
+ SG_ ASCU_Heartbeat : 0|8@1+ (1,0) [0|0] ""  AMS
+
+BO_ 1000 ASPU_Vectornav_Longitude: 8 ASPU
+ SG_ ASPU_Vectornav_Longitude : 0|64@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 999 ASPU_Vectornav_Latitude: 8 ASPU
+ SG_ ASPU_Vectornav_Latitude : 0|64@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 998 ASPU_Vectornav_InsStatus: 2 ASPU
+ SG_ ASPU_Vectornav_InsStatus : 0|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 997 ASPU_Vectornav_LinAccY_LinAccZ: 8 ASPU
+ SG_ ASPU_Vectornav_LinAccZ : 32|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+ SG_ ASPU_Vectornav_LinAccY : 0|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+
+BO_ 996 ASPU_Vectornav_AngVelZ_LinAccX: 8 ASPU
+ SG_ ASPU_Vectornav_LinAccX : 32|32@1- (1,0) [0|0] "m/s2" Vector__XXX
+ SG_ ASPU_Vectornav_AngVelZ : 0|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 995 ASPU_Vectornav_AngVelX_AngVelY: 8 ASPU
+ SG_ ASPU_Vectornav_AngVelY : 32|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+ SG_ ASPU_Vectornav_AngVelX : 0|32@1- (1,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 994 ASPU_Vectornav_LinVelY_LinVelZ: 8 ASPU
+ SG_ ASPU_Vectornav_LinVelZ : 32|32@1- (1,0) [0|0] "m/s" Vector__XXX
+ SG_ ASPU_Vectornav_LinVelY : 0|32@1- (1,0) [0|0] "m/s" Vector__XXX
+
+BO_ 993 ASPU_Vectornav_Roll_LinVelX: 8 ASPU
+ SG_ ASPU_Vectornav_LinVelX : 32|32@1- (1,0) [0|0] "m/s" Vector__XXX
+ SG_ ASPU_Vectornav_Roll : 0|32@1- (1,0) [0|0] "deg" Vector__XXX
+
+BO_ 992 ASPU_Vectornav_Yaw_Pitch: 8 ASPU
+ SG_ ASPU_Vectornav_Pitch : 32|32@1- (1,0) [0|0] "deg" Vector__XXX
+ SG_ ASPU_Vectornav_Yaw : 0|32@1- (1,0) [0|0] "deg" Vector__XXX
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 65535;
+BA_DEF_ SG_  "WakeupAllowed" ENUM  "No","Yes";
+BA_DEF_ BO_  "NmMessage" ENUM  "No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes";
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","vector_leerstring";
+BA_DEF_ BU_  "NmNode" ENUM  "No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","vector_leerstring";
+BA_DEF_ BU_  "NmStationAddress" INT 0 63;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 50000;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 50000;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 999999;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","vector_leerstring";
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 100000;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","Yes","No","Yes","no","yes","No","Yes","No","Yes","No","vector_leerstring";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 1;
+BA_DEF_ BO_  "GenMsgBackgroundColor" STRING ;
+BA_DEF_ BO_  "GenMsgForegroundColor" STRING ;
+BA_DEF_ BO_  "matchingcriteria" INT 0 0;
+BA_DEF_ BO_  "filterlabeling" INT 0 0;
+BA_DEF_DEF_  "NodeLayerModules" "CANoeILNLVector";
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "WakeupAllowed" "No";
+BA_DEF_DEF_  "NmMessage" "No";
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "NmNode" "No";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "BusType" "";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgSendType" "No";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "No";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenMsgBackgroundColor" "#ffffff";
+BA_DEF_DEF_  "GenMsgForegroundColor" "#000000";
+BA_DEF_DEF_  "matchingcriteria" 0;
+BA_DEF_DEF_  "filterlabeling" 0;
+BA_ "BusType" "CAN";
+BA_ "GenMsgForegroundColor" BO_ 1302 "#000000";
+VAL_ 1088 DTU_ErrorCode 42 "HOSTPROT_ERROR_QUEUE_FULL" 41 "HOSTPROT_CMD_QUEUE_FULL" 40 "HOSTPROT_TX_CAN_QUEUE_FULL" 39 "HOSTPROT_INVALID_HOST_PACKET_ID" 38 "HOST_IF_RX_SIZE_OVER_EP_SIZE" 37 "HOST_IF_TX_QUEUE_FULL" 36 "CAN_REDUNDANCY_GET_ID_OOB" 35 "CAN_REDUNDANCY_CHECK_ID_OOB" 34 "CAN_BUS_IT_ERROR" 33 "CAN_BUS_ARRAY2MSG_LEN_ERROR" 32 "CAN_BUS_ARRAY2MSG_LEN_OOB" 31 "CAN_BUS_LOGGING_OVERLOAD" 30 "CAN_BUS_CONTROL_OVERLOAD" 29 "CAN_BUS_HOST_IF_OVERLOAD" 28 "CAN_BUS_INIT_FAILED" 27 "CODEC_FRAME_SIZE_ZERO" 26 "CODEC_FEC_SIZE_INCONSISTENCY" 25 "CODEC_DEC_SIZE_INCONSISTENCY" 24 "CODEC_ENC_SIZE_INCONSISTENCY" 23 "CODEC_DEC_INIT_SIZE_OVER_MAX" 22 "CODEC_ENC_INIT_SIZE_OVER_MAX" 21 "CODEC_DECODER_OPUS_INIT_FAIL" 20 "CODEC_ENCODER_OPUS_INIT_FAIL" 19 "SAMPLING_TIMER_START_FAILED" 18 "DAC_HAL_ERROR" 17 "DAC_HW_INIT_FAILED" 16 "ADC_HAL_ERROR" 15 "ADC_HW_INIT_FAILED" 14 "MIC_DETECTION_TIMER_FAILED" 13 "SETTINGS_TIMEOUT_START_HAL_FAIL" 12 "SETTINGS_RX_RECONF_FREQUENTLY" 11 "SETTINGS_EE_FORMAT_FAILED" 10 "SETTINGS_EE_READ_FAILED" 9 "SETTINGS_EE_WRITE_FAILED" 8 "SETTINGS_EE_INIT_FAILED" 7 "DTUPROT_COMPR_CAN_NO_ENTRY" 6 "DTUPROT_COMPR_CAN_FROM_STATION" 5 "DTUPROT_CAN_PACKET_OVER_MAX_LEN" 4 "RF_INCORRECT_IRQ_FLAGS" 3 "RF_TX_PAYLOAD_OVER_MAX_LEN" 2 "RF_SPI_TRANSM_START_FAILED" 1 "RF_SPI_HAL_ERROR_CB" 0 "RF_HW_INIT_FAILED" ;
+SIG_VALTYPE_ 1000 ASPU_Vectornav_Longitude : 2;
+SIG_VALTYPE_ 999 ASPU_Vectornav_Latitude : 2;
+SIG_VALTYPE_ 997 ASPU_Vectornav_LinAccZ : 1;
+SIG_VALTYPE_ 997 ASPU_Vectornav_LinAccY : 1;
+SIG_VALTYPE_ 996 ASPU_Vectornav_LinAccX : 1;
+SIG_VALTYPE_ 996 ASPU_Vectornav_AngVelZ : 1;
+SIG_VALTYPE_ 995 ASPU_Vectornav_AngVelY : 1;
+SIG_VALTYPE_ 995 ASPU_Vectornav_AngVelX : 1;
+SIG_VALTYPE_ 994 ASPU_Vectornav_LinVelZ : 1;
+SIG_VALTYPE_ 994 ASPU_Vectornav_LinVelY : 1;
+SIG_VALTYPE_ 993 ASPU_Vectornav_LinVelX : 1;
+SIG_VALTYPE_ 993 ASPU_Vectornav_Roll : 1;
+SIG_VALTYPE_ 992 ASPU_Vectornav_Pitch : 1;
+SIG_VALTYPE_ 992 ASPU_Vectornav_Yaw : 1;
+
