@@ -42,7 +42,7 @@ class CANModel:
     Core CAN functionality (non-GUI). Handles sending messages.
     If the system doesn't support SocketCAN (e.g., Windows), it falls back to no-op.
     """
-    def __init__(self, arbitration_id=0xC0FFEE, data=None, is_extended_id=True, dbc_path="H19_CAN_dbc.dbc"):
+    def __init__(self, arbitration_id=0xC0FFEE, data=None, is_extended_id=True, dbc_path="H20_CAN_dbc.dbc"):
         self.arbitration_id = arbitration_id
         self.data = data if data else [0x00] * 8
         self.is_extended_id = is_extended_id
@@ -151,7 +151,7 @@ class AllMsg:
     Periodically receives messages via root.after scheduling.
     If on Windows without a SocketCAN interface, 'bus' will be None and receive_messages() won't do anything.
     """
-    def __init__(self, root, controller, dbc_path="H19_CAN_dbc.dbc"):
+    def __init__(self, root, controller, dbc_path="H20_CAN_dbc.dbc"):
         self.root = root
         self.root.title("CAN Messages and Values")
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
@@ -242,6 +242,48 @@ class AllMsg:
 
     def register_all_callbacks(self):
         """Register callbacks for all relevant signals from the DBC file"""
+        
+        # === Switch Wheel Unit (SWU) signals for steering wheel buttons ===
+        # SWU_Button_States (ID: 752) signals for steering wheel buttons - New in H20 DBC
+        self.dispatcher.register_callback(
+            752, "SWU_Button_1_Menu", 
+            lambda value: self.controller.menu_toggle() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_2_OK",
+            lambda value: self.controller.handle_ok_button() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_3_Cooling",
+            lambda value: self.controller.toggle_cooling() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_4_Overall_Reset",
+            lambda value: self.controller.perform_reset() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_5_TS_On",
+            lambda value: self.controller.toggle_ts() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_6_R2D",
+            lambda value: self.controller.toggle_r2d() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_6_9_Down_RadioActive",
+            lambda value: self.controller.handle_down_button() if value == 1 else None
+        )
+        
+        self.dispatcher.register_callback(
+            752, "SWU_Button_8_Up_DRS",
+            lambda value: self.controller.handle_up_button() if value == 1 else None
+        )
         
         # === Event Selection Buttons (DIU_Driving_Mode_Request) ===
         self.dispatcher.register_callback(
@@ -361,47 +403,6 @@ class AllMsg:
             696, "DIU_Menu_open",
             lambda value: self.controller.menu_toggle() if value == 1 else None
         )
-        
-        # DIU_Button_States (ID: 688) signals for steering wheel buttons
-        self.dispatcher.register_callback(
-            688, "DIU_Button_1_Menu",
-            lambda value: self.controller.menu_toggle() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_2_OK",
-            lambda value: self.controller.handle_ok_button() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_3_Cooling",
-            lambda value: self.controller.toggle_cooling() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_4_Overall_Reset",
-            lambda value: self.controller.perform_reset() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_5_TS_On",
-            lambda value: self.controller.toggle_ts() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_6_R2D",
-            lambda value: self.controller.toggle_r2d() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_6_9_Down_RadioActive",
-            lambda value: self.controller.handle_down_button() if value == 1 else None
-        )
-        
-        self.dispatcher.register_callback(
-            688, "DIU_Button_8_Up_DRS",
-            lambda value: self.controller.handle_up_button() if value == 1 else None
-        )
     
     def apply_filter(self):
         """Apply filters to the Treeview"""
@@ -446,6 +447,7 @@ class AllMsg:
         # Define message IDs to simulate
         message_ids = [
             579,    # AMS_SOC
+            752,    # SWU_Button_States (new in H20)
             819,    # AMS_Cell_V_001_008
             835,    # AMS_Temp_001_008
             933,    # VCU_Temperatures
@@ -462,6 +464,7 @@ class AllMsg:
         inverter_temp = 25.0
         speed = 0.0
         drs_position = 0  # 0 = Off, 1 = On
+        swu_buttons = 0   # All buttons off
         
         while self.sim_running:
             # Randomly pick a message to update
@@ -472,6 +475,16 @@ class AllMsg:
                 # Slowly decrease SOC
                 soc = max(0, soc - random.uniform(0, 0.1))
                 data = bytearray([int(soc), 0, 0, 0, 0, 0, 0, 0])
+            
+            elif msg_id == 752:  # SWU_Button_States (new in H20)
+                # Randomly trigger a button press
+                if random.random() < 0.1:  # 10% chance to press a button
+                    button_idx = random.randint(0, 7)
+                    swu_buttons = 1 << button_idx  # Set the bit for this button
+                else:
+                    swu_buttons = 0  # All buttons off
+                
+                data = bytearray([swu_buttons & 0xFF])
                 
             elif msg_id in range(819, 835):  # AMS_Cell_V messages
                 # Randomly update a cell voltage
@@ -683,7 +696,6 @@ class AllMsg:
                 
         # Update the tree view
         self.update_tree()
-
     def receive_messages(self):
         """
         Periodically receive CAN messages (if bus is available),

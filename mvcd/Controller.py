@@ -13,6 +13,7 @@ class Controller:
     - Listens for user interactions (button/key press).
     - Receives CAN frames (via a background thread) and updates the model accordingly.
     - Manages menu navigation and screen transitions.
+    - Handles SWU (Switch Wheel Unit) button inputs from the steering wheel.
     """
     def __init__(self, model, view, can_bus=None):
         self.model = model
@@ -474,7 +475,10 @@ class Controller:
             logging.error(f"Error updating cell voltage {global_idx}: {e}")
             
     def handle_ok_button(self):
-    
+        """
+        Handle the 'OK' button press from the steering wheel.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: OK button pressed")
     
         # If in a menu, select the currently highlighted item
@@ -489,7 +493,10 @@ class Controller:
         self.menu_toggle()
 
     def handle_up_button(self):
-        """Handle the 'Up' button press from the steering wheel"""
+        """
+        Handle the 'Up' button press from the steering wheel.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: Up button pressed")
         
         # If in a menu, move highlight up
@@ -504,7 +511,10 @@ class Controller:
             self.update_value("DRS", new_drs)
 
     def handle_down_button(self):
-        """Handle the 'Down' button press from the steering wheel"""
+        """
+        Handle the 'Down' button press from the steering wheel.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: Down button pressed")
         
         # If in a menu, move highlight down
@@ -517,7 +527,10 @@ class Controller:
             self.cycle_tc_mode()
 
     def toggle_cooling(self):
-        """Toggle cooling system via the steering wheel button"""
+        """
+        Toggle cooling system via the steering wheel button.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: Cooling button pressed")
         
         # Send a CAN message to toggle the cooling system
@@ -541,19 +554,28 @@ class Controller:
                 logging.error(f"Error sending cooling toggle message: {e}")
 
     def toggle_ts(self):
-        """Toggle traction system via the steering wheel button"""
+        """
+        Toggle traction system via the steering wheel button.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: TS button pressed")
         # This would typically send a message to the appropriate controller
         # to toggle the traction system power
 
     def toggle_r2d(self):
-        """Toggle Ready-to-Drive mode via the steering wheel button"""
+        """
+        Toggle Ready-to-Drive mode via the steering wheel button.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: R2D button pressed")
         # This would typically send a message to enter Ready-to-Drive mode
         # Often this requires a specific sequence of actions
 
     def perform_reset(self):
-        """Perform a general reset via the steering wheel button"""
+        """
+        Perform a general reset via the steering wheel button.
+        This is a new method for the SWU button input.
+        """
         logging.info("SWU: Reset button pressed")
         # This would typically reset various subsystems
         # For safety, might require a confirmation dialog
