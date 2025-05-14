@@ -591,6 +591,9 @@ class Controller:
         logging.info("SWU: Reset button pressed")
         # This would typically reset various subsystems
         # For safety, might require a confirmation dialog
+        
+        
+    # Add to Controller.py
     def update_switch_state(self, switch_num, value):
         """
         Handle switch state changes from the SWU (Switch Wheel Unit)
@@ -601,38 +604,64 @@ class Controller:
         """
         logging.info(f"SWU: Switch {switch_num} changed to {value}")
         
-        # Update model with switch position
-        self.update_value(f"Switch {switch_num}", value)
+        # Map switch positions to meaningful values
+        if switch_num == 1:  # Traction Control Mode switch
+            modes = ["Off", "Dry", "Wet", "Snow", "Custom", "Auto"]
+            if 0 <= value < len(modes):
+                self.current_tc_mode = value
+                self.update_value("Traction Control Mode", modes[value])
+            else:
+                self.update_value("Traction Control Mode", f"Mode {value}")
         
-        # Special handling based on switch position
-        if switch_num == 1:  # Example: Switch 1 controls traction control mode
-            if 0 <= value < len(self.tc_modes):
-                self.update_value("Traction Control Mode", self.tc_modes[value])
+        elif switch_num == 2:  # Torque Vectoring Mode switch
+            modes = ["Off", "Low", "Medium", "High", "Custom"]
+            if 0 <= value < len(modes):
+                self.current_tv_mode = value
+                self.update_value("Torque Vectoring Mode", modes[value])
+            else:
+                self.update_value("Torque Vectoring Mode", f"Mode {value}")
         
-        elif switch_num == 2:  # Example: Switch 2 controls torque vectoring
-            if 0 <= value < len(self.tv_modes):
-                self.update_value("Torque Vectoring Mode", self.tv_modes[value])
+        # Track all switch positions in the model
+        self.update_value(f"Switch_{switch_num}", value)
 
     def handle_dtu_error(self, error_code):
         """
-        Handle DTU error codes
+        Handle DTU error codes as defined in the DBC file
         
         Args:
             error_code: The DTU error code (0-42)
         """
-        if error_code == 0:
-            logging.warning("DTU Error: RF_HW_INIT_FAILED")
-        elif error_code == 28:
-            logging.warning("DTU Error: CAN_BUS_INIT_FAILED")
-        # Add more error codes as needed
+        # Map of error codes to descriptive messages
+        error_messages = {
+            0: "RF_HW_INIT_FAILED",
+            1: "RF_SPI_HAL_ERROR_CB",
+            2: "RF_SPI_TRANSM_START_FAILED",
+            3: "RF_TX_PAYLOAD_OVER_MAX_LEN",
+            4: "RF_INCORRECT_IRQ_FLAGS",
+            5: "DTUPROT_CAN_PACKET_OVER_MAX_LEN",
+            6: "DTUPROT_COMPR_CAN_FROM_STATION",
+            7: "DTUPROT_COMPR_CAN_NO_ENTRY",
+            8: "SETTINGS_EE_INIT_FAILED",
+            # Add more as needed, or load dynamically from DBC file
+        }
         
-        # Update UI with error if needed
-        if error_code > 0 and hasattr(self.view, 'show_debug_message'):
-            self.view.show_debug_message(f"DTU Error Code: {error_code}")
+        # Get error message, or use a generic one if not found
+        error_message = error_messages.get(error_code, f"UNKNOWN_ERROR_{error_code}")
+        
+        if error_code > 0:
+            logging.warning(f"DTU Error: {error_message} (Code: {error_code})")
+            
+            # Update the model with the error
+            self.update_value("DTU_Error", error_code)
+            self.update_value("DTU_Error_Message", error_message)
+            
+            # Show the error on the UI if possible
+            if hasattr(self.view, 'show_debug_message'):
+                self.view.show_debug_message(f"DTU Error: {error_message} (Code: {error_code})")
 
     def update_pdu_fault(self, component, is_fault):
         """
-        Update PDU fault status
+        Update PDU fault status. This handles the individual fault bits from ID 911.
         
         Args:
             component: Component name (e.g., "VLU", "InverterR")
@@ -640,9 +669,15 @@ class Controller:
         """
         logging.info(f"PDU Fault: {component} {'FAULT' if is_fault else 'OK'}")
         
-        # Update model with fault status
-        self.update_value(f"PDU Fault {component}", is_fault)
+        # Update the model
+        fault_key = f"PDU_Fault_{component}"
+        self.update_value(fault_key, is_fault)
         
-        # Notify user of critical faults
-        if is_fault and hasattr(self.view, 'show_debug_message'):
-            self.view.show_debug_message(f"FAULT: {component}")
+        # Update a master fault status
+        all_faults = {k: v for k, v in self.model.values.items() if k.startswith("PDU_Fault_") and v}
+        
+        if is_fault:
+            # Critical fault handling
+            if component in ["InverterR", "InverterL", "VCU", "AMS", "ASMS"]:
+                if hasattr(self.view, 'show_debug_message'):
+                    self.view.show_debug_message(f"CRITICAL FAULT: {component}")
