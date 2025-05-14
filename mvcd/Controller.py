@@ -374,11 +374,23 @@ class Controller:
                 # Quit the application
                 self.view.quit()
             elif key == 's':
-                # Example: highlight main-menu button #2, if the method exists
-                if hasattr(self.view, '_highlight_main_menu_button'):
-                    self.view._highlight_main_menu_button(2)
+                # Show settings screen (new mapping)
+                self.view.show_menu_screen(self.view.menu_main_frame)
+            elif key == 'f':
+                # Toggle fullscreen (new mapping)
+                self.toggle_fullscreen()
         except Exception as e:
             logging.error(f"Error handling key press {event.keysym}: {e}")
+
+    def toggle_fullscreen(self):
+        """Toggle fullscreen mode"""
+        if hasattr(self.view, 'attributes'):
+            try:
+                # Toggle fullscreen state
+                self.view.attributes("-fullscreen", not self.view.attributes("-fullscreen"))
+                logging.info(f"Fullscreen toggled")
+            except Exception as e:
+                logging.error(f"Error toggling fullscreen: {e}")
 
     def change_max_torque(self, amount):
         """Change the maximum torque setting"""
@@ -579,3 +591,58 @@ class Controller:
         logging.info("SWU: Reset button pressed")
         # This would typically reset various subsystems
         # For safety, might require a confirmation dialog
+    def update_switch_state(self, switch_num, value):
+        """
+        Handle switch state changes from the SWU (Switch Wheel Unit)
+        
+        Args:
+            switch_num: Which switch changed (1-5)
+            value: New value (0-15, as it's a 4-bit value per switch)
+        """
+        logging.info(f"SWU: Switch {switch_num} changed to {value}")
+        
+        # Update model with switch position
+        self.update_value(f"Switch {switch_num}", value)
+        
+        # Special handling based on switch position
+        if switch_num == 1:  # Example: Switch 1 controls traction control mode
+            if 0 <= value < len(self.tc_modes):
+                self.update_value("Traction Control Mode", self.tc_modes[value])
+        
+        elif switch_num == 2:  # Example: Switch 2 controls torque vectoring
+            if 0 <= value < len(self.tv_modes):
+                self.update_value("Torque Vectoring Mode", self.tv_modes[value])
+
+    def handle_dtu_error(self, error_code):
+        """
+        Handle DTU error codes
+        
+        Args:
+            error_code: The DTU error code (0-42)
+        """
+        if error_code == 0:
+            logging.warning("DTU Error: RF_HW_INIT_FAILED")
+        elif error_code == 28:
+            logging.warning("DTU Error: CAN_BUS_INIT_FAILED")
+        # Add more error codes as needed
+        
+        # Update UI with error if needed
+        if error_code > 0 and hasattr(self.view, 'show_debug_message'):
+            self.view.show_debug_message(f"DTU Error Code: {error_code}")
+
+    def update_pdu_fault(self, component, is_fault):
+        """
+        Update PDU fault status
+        
+        Args:
+            component: Component name (e.g., "VLU", "InverterR")
+            is_fault: True if fault is present, False otherwise
+        """
+        logging.info(f"PDU Fault: {component} {'FAULT' if is_fault else 'OK'}")
+        
+        # Update model with fault status
+        self.update_value(f"PDU Fault {component}", is_fault)
+        
+        # Notify user of critical faults
+        if is_fault and hasattr(self.view, 'show_debug_message'):
+            self.view.show_debug_message(f"FAULT: {component}")

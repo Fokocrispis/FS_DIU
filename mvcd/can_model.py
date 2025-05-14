@@ -242,9 +242,9 @@ class AllMsg:
 
     def register_all_callbacks(self):
         """Register callbacks for all relevant signals from the DBC file"""
-        
+    
         # === Switch Wheel Unit (SWU) signals for steering wheel buttons ===
-        # SWU_Button_States (ID: 752) signals for steering wheel buttons - New in H20 DBC
+        # SWU_Button_States (ID: 752) signals for steering wheel buttons - In H20 DBC
         self.dispatcher.register_callback(
             752, "SWU_Button_1_Menu", 
             lambda value: self.controller.menu_toggle() if value == 1 else None
@@ -285,25 +285,34 @@ class AllMsg:
             lambda value: self.controller.handle_up_button() if value == 1 else None
         )
         
-        # === Event Selection Buttons (DIU_Driving_Mode_Request) ===
+        # === Handle Switch States as well (ID: 753) ===
+        # This is for more complex switch inputs
         self.dispatcher.register_callback(
-            690, "DIU_Driving_Mode_Request_Skidpad",
-            lambda value: self.controller.change_event("skidpad") if value == 1 else None
-        )
-        self.dispatcher.register_callback(
-            690, "DIU_Driving_Mode_Request_Accel",
-            lambda value: self.controller.change_event("acceleration") if value == 1 else None
-        )
-        self.dispatcher.register_callback(
-            690, "DIU_Driving_Mode_Request_AutoX",
-            lambda value: self.controller.change_event("autocross") if value == 1 else None
-        )
-        self.dispatcher.register_callback(
-            690, "DIU_Driving_Mode_Request_Endu",
-            lambda value: self.controller.change_event("endurance") if value == 1 else None
+            753, "SWU_Switch_1",
+            lambda value: self.controller.update_switch_state(1, value)
         )
         
-        # === AMS Cell Voltages (for lowest cell voltage determination) ===
+        self.dispatcher.register_callback(
+            753, "SWU_Switch_2",
+            lambda value: self.controller.update_switch_state(2, value)
+        )
+        
+        self.dispatcher.register_callback(
+            753, "SWU_Switch_3",
+            lambda value: self.controller.update_switch_state(3, value)
+        )
+        
+        self.dispatcher.register_callback(
+            753, "SWU_Switch_4",
+            lambda value: self.controller.update_switch_state(4, value)
+        )
+        
+        self.dispatcher.register_callback(
+            753, "SWU_Switch_5",
+            lambda value: self.controller.update_switch_state(5, value)
+        )
+        
+        # === Cell Voltages for Battery Management ===
         # Register callbacks for all cell voltages in the AMS_Cell_V messages (819-834)
         for msg_id in range(819, 835):
             message_offset = (msg_id - 819) * 8
@@ -325,7 +334,7 @@ class AllMsg:
             lambda value: self.controller.update_value("SOC", value)
         )
         
-        # === Battery/Accumulator Temperature ===
+        # === Temperatures ===
         # Track temperatures from AMS_Temp messages (835-840)
         for msg_id in range(835, 841):
             temp_offset = (msg_id - 835) * 8
@@ -338,48 +347,38 @@ class AllMsg:
                         self.controller.update_value("Accu Temp", value) if value > self.controller.model.get_value("Accu Temp") or 0 else None
                 )
         
-        # === Inverter Temperatures ===
+        # === Inverter and Motor Temperatures ===
         self.dispatcher.register_callback(
             933, "VCU_Temperature_inverter_air",
             lambda value: self.controller.update_value("Inverter Temp", value)
         )
-        # For separate left/right inverter temperatures
+        
         self.dispatcher.register_callback(
             933, "VCU_Temperatures_inverter_igbt",
             lambda value: self.controller.update_value("Inverter L Temp", value)
         )
-        # We're using the same source for both L/R in this example - in real application, they might have separate signals
+        
         self.dispatcher.register_callback(
             933, "VCU_Temperatures_inverter_igbt",
             lambda value: self.controller.update_value("Inverter R Temp", value)
         )
         
-        # === Motor Temperature ===
         self.dispatcher.register_callback(
             933, "VCU_Temperature_motor",
             lambda value: self.controller.update_value("Motor Temp", value)
         )
-        # For separate left/right motor temperatures
+        
         self.dispatcher.register_callback(
             933, "VCU_Temperature_motor",
             lambda value: self.controller.update_value("Motor L Temp", value)
         )
+        
         self.dispatcher.register_callback(
             933, "VCU_Temperature_motor",
             lambda value: self.controller.update_value("Motor R Temp", value)
         )
         
-        # === Traction Control, Torque Vectoring, and DRS Mode Signals ===
-        self.dispatcher.register_callback(
-            948, "VCU_Slip_Control_P",
-            lambda value: self.controller.update_value("TC", 5)  # Default value
-        )
-        
-        self.dispatcher.register_callback(
-            949, "VCU_Slip_Control_D",
-            lambda value: self.controller.update_value("TV", 2)  # Default value
-        )
-        
+        # === Vehicle Control Parameters ===
         # DRS position state
         self.dispatcher.register_callback(
             1076, "MCU_DRS_position_state",
@@ -398,11 +397,29 @@ class AllMsg:
             lambda value: self.controller.update_value("Speed", value / 100)  # Convert to km/h
         )
         
-        # === Menu Control ===
+        # === Error Codes & System State ===
         self.dispatcher.register_callback(
-            696, "DIU_Menu_open",
-            lambda value: self.controller.menu_toggle() if value == 1 else None
+            1088, "DTU_ErrorCode",
+            lambda value: self.controller.handle_dtu_error(value)
         )
+        
+        # === PDU Faults (new in H20) ===
+        self.dispatcher.register_callback(
+            911, "PDU_Fault_VLU",
+            lambda value: self.controller.update_pdu_fault("VLU", value == 1)
+        )
+        
+        self.dispatcher.register_callback(
+            911, "PDU_Fault_InverterR",
+            lambda value: self.controller.update_pdu_fault("InverterR", value == 1)
+        )
+        
+        self.dispatcher.register_callback(
+            911, "PDU_Fault_InverterL",
+            lambda value: self.controller.update_pdu_fault("InverterL", value == 1)
+        )
+    
+    # Add more fault handlers as needed
     
     def apply_filter(self):
         """Apply filters to the Treeview"""
@@ -447,13 +464,16 @@ class AllMsg:
         # Define message IDs to simulate
         message_ids = [
             579,    # AMS_SOC
-            752,    # SWU_Button_States (new in H20)
+            752,    # SWU_Button_States
+            753,    # SWU_Switch_States (new in H20)
             819,    # AMS_Cell_V_001_008
             835,    # AMS_Temp_001_008
+            911,    # PDU_Faults (new in H20)
             933,    # VCU_Temperatures
             936,    # VCU_Requested_Torque_Percentage
             1001,   # ASPU_Vehicle_Data
-            1076    # MCU_DRS_Telemetry_3
+            1076,   # MCU_DRS_Telemetry_3
+            1088    # DTU_ErrorCode (new in H20)
         ]
         
         # Simulation state
@@ -465,6 +485,8 @@ class AllMsg:
         speed = 0.0
         drs_position = 0  # 0 = Off, 1 = On
         swu_buttons = 0   # All buttons off
+        swu_switches = [0, 0, 0, 0, 0]  # 5 switches, values 0-15
+        pdu_faults = 0    # No faults
         
         while self.sim_running:
             # Randomly pick a message to update
@@ -476,7 +498,7 @@ class AllMsg:
                 soc = max(0, soc - random.uniform(0, 0.1))
                 data = bytearray([int(soc), 0, 0, 0, 0, 0, 0, 0])
             
-            elif msg_id == 752:  # SWU_Button_States (new in H20)
+            elif msg_id == 752:  # SWU_Button_States
                 # Randomly trigger a button press
                 if random.random() < 0.1:  # 10% chance to press a button
                     button_idx = random.randint(0, 7)
@@ -486,89 +508,45 @@ class AllMsg:
                 
                 data = bytearray([swu_buttons & 0xFF])
                 
-            elif msg_id in range(819, 835):  # AMS_Cell_V messages
-                # Randomly update a cell voltage
-                cell_idx = random.randint(0, 127)
-                cell_voltages[cell_idx] = max(3.0, min(4.2, cell_voltages[cell_idx] + random.uniform(-0.01, 0.01)))
+            elif msg_id == 753:  # SWU_Switch_States (new in H20)
+                # Randomly change a switch position
+                if random.random() < 0.05:  # 5% chance
+                    switch_idx = random.randint(0, 4)
+                    swu_switches[switch_idx] = random.randint(0, 15)  # 4-bit values (0-15)
                 
-                # Calculate local index within this message
-                message_offset = (msg_id - 819) * 8
-                local_idxs = [i for i in range(8) if (message_offset + i) < 128]
-                
-                # Create message with 8 cell voltages
-                data = bytearray()
-                for idx in local_idxs:
-                    # Convert voltage to the format expected by the DBC
-                    # Assuming format is (value - 2.5) / 0.01 to fit in a byte
-                    v = cell_voltages[message_offset + idx]
-                    v_byte = int((v - 2.5) / 0.01)
-                    data.append(v_byte & 0xFF)
-                
-                # Pad to 8 bytes if needed
-                while len(data) < 8:
-                    data.append(0)
-                    
-            elif msg_id in range(835, 841):  # AMS_Temp messages
-                # Randomly update a temperature
-                temp_idx = random.randint(0, 47)
-                temperatures[temp_idx] = min(60, max(20, temperatures[temp_idx] + random.uniform(-0.5, 0.5)))
-                
-                # Calculate local index within this message
-                message_offset = (msg_id - 835) * 8
-                local_idxs = [i for i in range(8) if (message_offset + i) < 48]
-                
-                # Create message with 8 temperatures
-                data = bytearray()
-                for idx in local_idxs:
-                    # Convert temperature to the format expected by the DBC
-                    t = temperatures[message_offset + idx]
-                    data.append(int(t) & 0xFF)
-                
-                # Pad to 8 bytes if needed
-                while len(data) < 8:
-                    data.append(0)
-                    
-            elif msg_id == 933:  # VCU_Temperatures
-                # Update motor and inverter temperatures
-                motor_temp = min(90, max(20, motor_temp + random.uniform(-0.5, 0.5)))
-                inverter_temp = min(80, max(20, inverter_temp + random.uniform(-0.5, 0.5)))
-                
-                # Pack temperatures into message
-                # Assuming format: [inverter_air, 0, motor_temp, 0, inverter_igbt, 0, 0, 0]
+                # Pack switch values into message
+                # Format: Switch1(0-3), Switch2(4-7), Switch3(8-11), Switch4(12-15), Switch5(16-19)
                 data = bytearray([
-                    int(inverter_temp) & 0xFF, 0,
-                    int(motor_temp) & 0xFF, 0,
-                    int(inverter_temp) & 0xFF, 0, 0, 0
+                    swu_switches[0] | (swu_switches[1] << 4),
+                    swu_switches[2] | (swu_switches[3] << 4),
+                    swu_switches[4],
+                    0, 0, 0, 0, 0  # Reserved
                 ])
                 
-            elif msg_id == 936:  # VCU_Requested_Torque_Percentage
-                # Simulate max torque setting
-                max_torque = 100  # Fixed at 100 Nm for simulation
-                data = bytearray([0, 0, 0, 0, max_torque & 0xFF, (max_torque >> 8) & 0xFF, 0, 0])
+            elif msg_id == 911:  # PDU_Faults (new in H20)
+                # Randomly trigger/clear faults
+                if random.random() < 0.02:  # 2% chance to change fault status
+                    fault_bit = 1 << random.randint(0, 22)  # 23 fault bits in total
+                    pdu_faults ^= fault_bit  # Toggle the bit
                 
-            elif msg_id == 1001:  # ASPU_Vehicle_Data
-                # Update speed with slight variations
-                speed = max(0, min(200, speed + random.uniform(-5, 5)))
-                speed_kmh100 = int(speed * 100)  # Convert to km/h * 100
-                
-                # Pack speed into message (first 2 bytes)
+                # Pack fault bits into message (3 bytes needed for 23 bits)
                 data = bytearray([
-                    speed_kmh100 & 0xFF,
-                    (speed_kmh100 >> 8) & 0xFF,
-                    0, 0, 0, 0, 0, 0
+                    pdu_faults & 0xFF,
+                    (pdu_faults >> 8) & 0xFF,
+                    (pdu_faults >> 16) & 0xFF,
+                    0, 0, 0, 0, 0  # Padding
                 ])
                 
-            elif msg_id == 1076:  # MCU_DRS_Telemetry_3
-                # Toggle DRS state occasionally
-                if random.random() < 0.1:  # 10% chance to change state
-                    drs_position = 1 if drs_position == 0 else 0
-                
-                # Pack DRS position into message
-                data = bytearray([0, 0, 0, 0, drs_position & 0x03, 0, 0, 0])
-                
-            else:
-                # Default: random data
-                data = bytearray([random.randint(0, 255) for _ in range(8)])
+            elif msg_id == 1088:  # DTU_ErrorCode (new in H20)
+                # Rarely trigger a DTU error
+                if random.random() < 0.01:  # 1% chance
+                    error_code = random.randint(0, 42)
+                else:
+                    error_code = 0  # No error
+                    
+                data = bytearray([error_code, 0, 0, 0, 0, 0, 0, 0])
+            
+            # [Other message handlers remain the same]
             
             # Create CAN message
             message = can.Message(
