@@ -20,9 +20,7 @@ class Model:
     - Process CAN messages
     - Notify observers of changes
     
-    For data persistence and offline development, the model can:
-    - Load/save values from/to disk
-    - Operate in a simulated mode without real CAN bus
+    Always starts with default values - no persistence between sessions.
     """
     def __init__(self, can_bus=None, dbc_path="H19_CAN_dbc.dbc", config_path="config.json"):
         self.can_bus = can_bus
@@ -32,7 +30,7 @@ class Model:
         # Thread safety for value updates
         self._lock = threading.RLock()
         
-        # Default initial values (will be overridden by load_config if available)
+        # Always start with default values (never load from config)
         self.values = self._get_default_values()
 
         # Optional units for display
@@ -51,13 +49,8 @@ class Model:
         # Mapping of message names to ID ranges (for fallback)
         self.message_id = self._get_message_id_map()
 
-        # Load DBC file and attempt to load saved configuration
+        # Load DBC file only
         self.db = self.load_dbc_file(self.dbc_path)
-        self.load_config()
-        
-        # Register periodic state saving
-        self._autosave_timer = None
-        self._start_autosave_timer()
 
     def _get_default_values(self) -> Dict[str, Any]:
         """Return default values for all model parameters"""
@@ -129,9 +122,6 @@ class Model:
         Define the screen layouts for all event types.
         This is structured as a nested list/dict that will be processed by the View.
         """
-        # The complete event screen configuration is quite long
-        # For brevity, I'm showing just the autocross screen setup
-        # Other screens would be defined similarly
         return {
             "autocross": [
                 [
@@ -162,7 +152,7 @@ class Model:
                     {"id": "Accu Temp",
                     "font_value": ("Segoe UI", 42, "bold"),
                     "font_name": ("Segoe UI", 22),
-                    "value_pady": (20,0), # For aesthetic lines
+                    "value_pady": (20,0),
                     "value_padx": 37}],
                 ],
                 
@@ -186,7 +176,6 @@ class Model:
                 ]
             ],
             "endurance": [
-                # Row 1 (top-left big panel)
                 [
                     {"id": "SOC",
                     "font_value": ("Segoe UI", 56, "bold"),
@@ -196,7 +185,6 @@ class Model:
                     "height": 150}
                 ],
                 
-                # Row 2 (bottom-left big panel)
                 [
                     {"id": "Lowest Cell",
                     "font_value": ("Segoe UI", 46, "bold"),
@@ -204,7 +192,6 @@ class Model:
                     "value_pady" : (20,0)}
                 ],
 
-                # Row 3 (top-right big panel)
                 [
                     [
                         {"id": "TC",
@@ -225,7 +212,6 @@ class Model:
                         "colspan": 2}]
                 ],
 
-                # Row 4 (bottom-right 2×2 sub-layout)
                 [
                     [{"id": "Motor L Temp",
                         "font_value": ("Segoe UI", 28, "bold"),
@@ -242,7 +228,6 @@ class Model:
                 ]
             ],
             "skidpad": [
-                # Layout mimics autocross for now but could be customized
                 [
                     {"id": "DRS",
                     "font_value": ("Segoe UI", 50, "bold"),
@@ -295,7 +280,6 @@ class Model:
                 ]
             ],
             "acceleration": [
-                # Layout mimics autocross for now but could be customized
                 [
                     {"id": "DRS",
                     "font_value": ("Segoe UI", 50, "bold"),
@@ -348,7 +332,6 @@ class Model:
                 ]
             ],
             "debugging": [
-                # Debugging screen with more technical information
                 [
                     {"id": "SOC",
                      "font_value": ("Segoe UI", 36, "bold"),
@@ -377,7 +360,6 @@ class Model:
                 ]
             ],
             "TS Off Screen": [
-                # Empty screen for when TS is off
                 [
                     {"id": "AMS",
                      "font_value": ("Segoe UI", 36, "bold"),
@@ -386,22 +368,6 @@ class Model:
                 ]
             ]
         }
-
-    def _start_autosave_timer(self, interval_ms: int = 30000):
-        """Start a timer to periodically save model state"""
-        if hasattr(self, '_autosave_timer') and self._autosave_timer:
-            self._autosave_timer.cancel()
-            
-        def _autosave():
-            self.save_config()
-            self._autosave_timer = threading.Timer(interval_ms / 1000, _autosave)
-            self._autosave_timer.daemon = True
-            self._autosave_timer.start()
-        
-        self._autosave_timer = threading.Timer(interval_ms / 1000, _autosave)
-        self._autosave_timer.daemon = True
-        self._autosave_timer.start()
-        logger.debug("Autosave timer started")
 
     def load_dbc_file(self, path: str) -> Optional[Any]:
         """
@@ -551,72 +517,11 @@ class Model:
             logger.error(f"CAN send error: {e}")
             return False
     
-    def save_config(self) -> bool:
-        """
-        Save the current model state to a JSON file.
-        Returns True if successful, False otherwise.
-        """
-        try:
-            with self._lock:
-                config = {
-                    'values': self.values,
-                    'current_event': self.current_event
-                }
-                
-                with open(self.config_path, 'w') as f:
-                    json.dump(config, f, indent=2)
-                    
-                logger.debug("Configuration saved successfully")
-                return True
-        except Exception as e:
-            logger.error(f"Error saving configuration: {e}")
-            return False
-    
-    def load_config(self) -> bool:
-        """
-        Load model state from a JSON file.
-        Returns True if successful, False otherwise.
-        """
-        if not os.path.exists(self.config_path):
-            logger.debug(f"Configuration file not found: {self.config_path}")
-            return False
-            
-        try:
-            with open(self.config_path, 'r') as f:
-                config = json.load(f)
-                
-                with self._lock:
-                    # Update values from config, preserving any values not in the config
-                    if 'values' in config:
-                        for key, value in config['values'].items():
-                            if key in self.values:  # Only update existing keys
-                                self.values[key] = value
-                    
-                    # Update current event if valid
-                    if 'current_event' in config and config['current_event'] in self.event_screens:
-                        self.current_event = config['current_event']
-                
-                logger.info("Configuration loaded successfully")
-                return True
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing configuration file: {e}")
-            return False
-        except Exception as e:
-            logger.error(f"Error loading configuration: {e}")
-            return False
-    
     def cleanup(self):
         """
         Clean up resources before application exit.
         This should be called when the application is shutting down.
         """
-        # Save current config
-        self.save_config()
-        
-        # Cancel the autosave timer
-        if hasattr(self, '_autosave_timer') and self._autosave_timer:
-            self._autosave_timer.cancel()
-            
         # Close CAN bus if open
         if self.can_bus:
             try:

@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description="Hawks Display")
     parser.add_argument("--virtual", action="store_true", help="Use virtual CAN (vcan0) instead of real CAN")
     parser.add_argument("--demo", action="store_true", help="Run in demo mode with simulated values")
-    parser.add_argument("--dbc", type=str, default="H19_CAN_dbc.dbc", help="Path to DBC file")
+    parser.add_argument("--dbc", type=str, default="H20_CAN_dbc.dbc", help="Path to DBC file")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
     
@@ -58,10 +58,10 @@ def main():
     if not os.path.exists(args.dbc):
         logging.error(f"DBC file '{args.dbc}' not found. CAN decoding will not work correctly.")
     
-    # Initialize CAN model with virtual flag
+    # Initialize CAN model
     can_model = CANModel(dbc_path=args.dbc)
     
-    # Create the application Model
+    # Create the application Model (always starts with default values)
     model = Model(can_model.bus, dbc_path=args.dbc)
     
     # Create the main Tkinter window through the Display class
@@ -87,6 +87,7 @@ def main():
     logging.info(f"Using DBC file: {args.dbc}")
     logging.info(f"Demo mode: {'Enabled' if args.demo else 'Disabled'}")
     logging.info(f"Debug mode: {'Enabled' if args.debug else 'Disabled'}")
+    logging.info("Starting with default values (no persistence)")
     
     # Run the Tkinter main loop
     try:
@@ -96,6 +97,11 @@ def main():
     except Exception as e:
         logging.error(f"Unhandled exception: {e}", exc_info=True)
     finally:
+        # Clean up resources
+        if hasattr(model, 'cleanup'):
+            model.cleanup()
+        if hasattr(can_model, 'shutdown'):
+            can_model.shutdown()
         logging.info("Application shutdown")
 
 if __name__ == '__main__':

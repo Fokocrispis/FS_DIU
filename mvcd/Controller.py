@@ -54,7 +54,7 @@ class Controller:
             self.listener_thread.start()
         else:
             logging.warning("No CAN bus available. Starting in demo mode.")
-            self.start_demo_mode()
+            #self.start_demo_mode()
 
     def setup_button_actions(self):
         """
@@ -129,10 +129,10 @@ class Controller:
                 logging.info("CAN listener successfully set up in Controller.")
             except Exception as e:
                 logging.error(f"Failed to set up CAN listener: {e}")
-                self.start_demo_mode()  # Fall back to demo mode if CAN bus is not available
+                # self.start_demo_mode()  # Don't auto-start demo mode on failure
         else:
             logging.error("No CAN bus available. Cannot listen for messages.")
-            self.start_demo_mode()  # Fall back to demo mode if CAN bus is not available
+            # self.start_demo_mode()  # Don't auto-start demo mode when no bus
 
     def process_can_message(self, msg):
         """
