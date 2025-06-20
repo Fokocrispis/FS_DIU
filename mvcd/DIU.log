@@ -695,3 +695,134 @@
 2025-06-19 23:49:39,359 - root - INFO - Debug mode: Disabled
 2025-06-19 23:49:39,359 - root - INFO - Starting with default values (no persistence)
 2025-06-19 23:49:46,268 - root - INFO - Application shutdown
+2025-06-20 15:48:23,782 - root - INFO - ============================================================
+2025-06-20 15:48:23,782 - root - INFO - DIU Display Starting
+2025-06-20 15:48:23,783 - root - INFO - ============================================================
+2025-06-20 15:48:23,783 - root - INFO - Control CAN Channel: can0
+2025-06-20 15:48:23,783 - root - INFO - Logging CAN Channel: can1
+2025-06-20 15:48:23,784 - root - INFO - DBC File: H20_CAN_dbc.dbc
+2025-06-20 15:48:23,784 - root - INFO - Demo Mode: Disabled
+2025-06-20 15:48:23,784 - root - INFO - Debug Mode: Disabled
+2025-06-20 15:48:23,785 - root - INFO - Virtual CAN: Disabled
+2025-06-20 15:48:23,785 - root - INFO - Starting with default values (no persistence)
+2025-06-20 15:48:23,896 - can_model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:48:23,924 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-06-20 15:48:23,928 - can_model - WARNING - Failed to initialize control bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:48:23,930 - can_model - WARNING - Failed to initialize logging bus on can1: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:48:23,932 - can_model - ERROR - Failed to initialize virtual control bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:48:23,933 - can_model - ERROR - Failed to initialize virtual logging bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:48:23,933 - root - INFO - CAN model initialized successfully
+2025-06-20 15:48:24,027 - Model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:48:24,028 - root - INFO - Data model initialized successfully
+2025-06-20 15:48:25,174 - root - INFO - GUI view initialized successfully
+2025-06-20 15:48:25,175 - root - ERROR - Failed to initialize controller: 'Controller' object has no attribute 'can_bus'
+2025-06-20 15:49:59,134 - root - INFO - Using virtual CAN channels: vcan0 (control), vcan1 (logging)
+2025-06-20 15:49:59,678 - root - INFO - ============================================================
+2025-06-20 15:49:59,679 - root - INFO - DIU Display Starting
+2025-06-20 15:49:59,679 - root - INFO - ============================================================
+2025-06-20 15:49:59,679 - root - INFO - Control CAN Channel: vcan0
+2025-06-20 15:49:59,680 - root - INFO - Logging CAN Channel: vcan1
+2025-06-20 15:49:59,680 - root - INFO - DBC File: H20_CAN_dbc.dbc
+2025-06-20 15:49:59,680 - root - INFO - Demo Mode: Disabled
+2025-06-20 15:49:59,681 - root - INFO - Debug Mode: Disabled
+2025-06-20 15:49:59,681 - root - INFO - Virtual CAN: Enabled
+2025-06-20 15:49:59,681 - root - INFO - Starting with default values (no persistence)
+2025-06-20 15:49:59,800 - can_model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:49:59,817 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-06-20 15:49:59,818 - can_model - WARNING - Failed to initialize control bus on vcan0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:49:59,820 - can_model - WARNING - Failed to initialize logging bus on vcan1: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:49:59,830 - can_model - ERROR - Failed to initialize virtual control bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:49:59,831 - can_model - ERROR - Failed to initialize virtual logging bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:49:59,832 - root - INFO - CAN model initialized successfully
+2025-06-20 15:49:59,939 - Model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:49:59,940 - root - INFO - Data model initialized successfully
+2025-06-20 15:50:00,257 - root - INFO - GUI view initialized successfully
+2025-06-20 15:50:00,257 - root - ERROR - Failed to initialize controller: 'Controller' object has no attribute 'can_bus'
+2025-06-20 15:54:14,905 - root - INFO - ============================================================
+2025-06-20 15:54:14,905 - root - INFO - DIU Display Starting
+2025-06-20 15:54:14,906 - root - INFO - ============================================================
+2025-06-20 15:54:14,906 - root - INFO - Control CAN Channel: can0
+2025-06-20 15:54:14,906 - root - INFO - Logging CAN Channel: can1
+2025-06-20 15:54:14,907 - root - INFO - DBC File: H20_CAN_dbc.dbc
+2025-06-20 15:54:14,907 - root - INFO - Demo Mode: Disabled
+2025-06-20 15:54:14,907 - root - INFO - Debug Mode: Disabled
+2025-06-20 15:54:14,907 - root - INFO - Virtual CAN: Disabled
+2025-06-20 15:54:14,908 - root - INFO - Starting with default values (no persistence)
+2025-06-20 15:54:15,020 - can_model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:54:15,037 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-06-20 15:54:15,038 - can_model - WARNING - Failed to initialize control bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:54:15,040 - can_model - WARNING - Failed to initialize logging bus on can1: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:54:15,041 - can_model - ERROR - Failed to initialize virtual control bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:54:15,043 - can_model - ERROR - Failed to initialize virtual logging bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:54:15,043 - root - INFO - CAN model initialized successfully
+2025-06-20 15:54:15,158 - Model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:54:15,159 - root - INFO - Data model initialized successfully
+2025-06-20 15:54:15,450 - root - INFO - GUI view initialized successfully
+2025-06-20 15:54:15,451 - root - WARNING - No control CAN bus available
+2025-06-20 15:54:15,451 - root - WARNING - No logging CAN bus available
+2025-06-20 15:54:15,452 - root - WARNING - No CAN buses available. Consider starting demo mode.
+2025-06-20 15:54:15,452 - root - INFO - Controller initialized successfully
+2025-06-20 15:54:15,452 - root - INFO - ============================================================
+2025-06-20 15:54:15,453 - root - INFO - DIU Display Successfully Started
+2025-06-20 15:54:15,453 - root - INFO - ============================================================
+2025-06-20 15:54:15,453 - root - INFO - Available keyboard shortcuts:
+2025-06-20 15:54:15,454 - root - INFO -   SPACE    - Toggle demo mode
+2025-06-20 15:54:15,454 - root - INFO -   N        - Next event
+2025-06-20 15:54:15,454 - root - INFO -   P        - Previous event
+2025-06-20 15:54:15,455 - root - INFO -   H/ESC    - Toggle menu
+2025-06-20 15:54:15,455 - root - INFO -   T        - Cycle traction control mode
+2025-06-20 15:54:15,455 - root - INFO -   V        - Cycle torque vectoring mode
+2025-06-20 15:54:15,456 - root - INFO -   D        - Toggle DRS state
+2025-06-20 15:54:15,456 - root - INFO -   S        - Show settings screen
+2025-06-20 15:54:15,457 - root - INFO -   F        - Toggle fullscreen
+2025-06-20 15:54:15,458 - root - INFO -   Q        - Quit application
+2025-06-20 15:54:15,458 - root - INFO - Control Bus Status: Failed
+2025-06-20 15:54:15,459 - root - INFO - Logging Bus Status: Failed
+2025-06-20 15:54:15,459 - root - WARNING - No CAN buses available - running in view-only mode
+2025-06-20 15:54:15,460 - root - INFO - ============================================================
+2025-06-20 15:54:40,508 - root - INFO - Application shutdown requested
+2025-06-20 15:54:40,646 - root - INFO - Application shutdown completed
+2025-06-20 15:55:34,011 - root - INFO - ============================================================
+2025-06-20 15:55:34,012 - root - INFO - DIU Display Starting
+2025-06-20 15:55:34,012 - root - INFO - ============================================================
+2025-06-20 15:55:34,013 - root - INFO - Control CAN Channel: can0
+2025-06-20 15:55:34,013 - root - INFO - Logging CAN Channel: can1
+2025-06-20 15:55:34,013 - root - INFO - DBC File: H20_CAN_dbc.dbc
+2025-06-20 15:55:34,014 - root - INFO - Demo Mode: Disabled
+2025-06-20 15:55:34,014 - root - INFO - Debug Mode: Disabled
+2025-06-20 15:55:34,014 - root - INFO - Virtual CAN: Disabled
+2025-06-20 15:55:34,015 - root - INFO - Starting with default values (no persistence)
+2025-06-20 15:55:34,137 - can_model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:55:34,156 - can.interfaces.socketcan.socketcan - ERROR - socket.CMSG_SPACE not available on this platform
+2025-06-20 15:55:34,158 - can_model - WARNING - Failed to initialize control bus on can0: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:55:34,159 - can_model - WARNING - Failed to initialize logging bus on can1: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:55:34,161 - can_model - ERROR - Failed to initialize virtual control bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:55:34,162 - can_model - ERROR - Failed to initialize virtual logging bus: [WinError 10047] An address incompatible with the requested protocol was used
+2025-06-20 15:55:34,162 - root - INFO - CAN model initialized successfully
+2025-06-20 15:55:34,275 - Model - INFO - DBC file loaded successfully: H20_CAN_dbc.dbc
+2025-06-20 15:55:34,276 - root - INFO - Data model initialized successfully
+2025-06-20 15:55:34,594 - root - INFO - GUI view initialized successfully
+2025-06-20 15:55:34,595 - root - WARNING - No control CAN bus available
+2025-06-20 15:55:34,595 - root - WARNING - No logging CAN bus available
+2025-06-20 15:55:34,595 - root - WARNING - No CAN buses available. Consider starting demo mode.
+2025-06-20 15:55:34,596 - root - INFO - Controller initialized successfully
+2025-06-20 15:55:34,596 - root - INFO - ============================================================
+2025-06-20 15:55:34,597 - root - INFO - DIU Display Successfully Started
+2025-06-20 15:55:34,597 - root - INFO - ============================================================
+2025-06-20 15:55:34,597 - root - INFO - Available keyboard shortcuts:
+2025-06-20 15:55:34,598 - root - INFO -   SPACE    - Toggle demo mode
+2025-06-20 15:55:34,598 - root - INFO -   N        - Next event
+2025-06-20 15:55:34,599 - root - INFO -   P        - Previous event
+2025-06-20 15:55:34,599 - root - INFO -   H/ESC    - Toggle menu
+2025-06-20 15:55:34,600 - root - INFO -   T        - Cycle traction control mode
+2025-06-20 15:55:34,600 - root - INFO -   V        - Cycle torque vectoring mode
+2025-06-20 15:55:34,600 - root - INFO -   D        - Toggle DRS state
+2025-06-20 15:55:34,601 - root - INFO -   S        - Show settings screen
+2025-06-20 15:55:34,601 - root - INFO -   F        - Toggle fullscreen
+2025-06-20 15:55:34,601 - root - INFO -   Q        - Quit application
+2025-06-20 15:55:34,602 - root - INFO - Control Bus Status: Failed
+2025-06-20 15:55:34,602 - root - INFO - Logging Bus Status: Failed
+2025-06-20 15:55:34,602 - root - WARNING - No CAN buses available - running in view-only mode
+2025-06-20 15:55:34,603 - root - INFO - ============================================================
+2025-06-20 16:06:05,177 - root - INFO - Application shutdown requested
+2025-06-20 16:06:05,331 - root - INFO - Application shutdown completed

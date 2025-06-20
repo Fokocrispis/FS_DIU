@@ -8,17 +8,19 @@ logging.basicConfig(level=logging.INFO)
 
 class Controller:
     """
-    The 'Controller' in an MVC architecture.
+    The 'Controller' in an MVC architecture with dual CAN bus support.
     - Binds model and view together.
     - Listens for user interactions (button/key press).
-    - Receives CAN frames (via a background thread) and updates the model accordingly.
+    - Receives CAN frames from both control and logging buses and updates the model accordingly.
     - Manages menu navigation and screen transitions.
     - Handles SWU (Switch Wheel Unit) button inputs from the steering wheel.
+    - Routes CAN messages to appropriate bus based on H20 specification.
     """
-    def __init__(self, model, view, can_bus=None):
+    def __init__(self, model, view, control_bus=None, logging_bus=None):
         self.model = model
         self.view = view
-        self.can_bus = can_bus or self.model.can_bus  # fallback to model's bus if not provided
+        self.control_bus = control_bus
+        self.logging_bus = logging_bus
 
         # Initialize state variables
         self.toggle_in_progress = False
@@ -48,13 +50,114 @@ class Controller:
         self.view.bind("<Key>", self.handle_key_press)
         self.view.focus_set()
 
-        # Start CAN listener in a separate thread if CAN bus is available
-        if self.can_bus:
-            self.listener_thread = threading.Thread(target=self.setup_can_listener, daemon=True)
-            self.listener_thread.start()
+        # Start CAN listeners in separate threads for both buses
+        self.setup_dual_can_listeners()
+
+        # Blink logo for visual feedback
+        self.logo_blink_state = True
+        self.view.after(1000, self.toggle_logo)
+
+    def setup_dual_can_listeners(self):
+        """
+        Set up CAN message listeners for both control and logging buses.
+        """
+        # Start control bus listener
+        if self.control_bus:
+            self.control_listener_thread = threading.Thread(
+                target=self.setup_can_listener, 
+                args=(self.control_bus, "control"),
+                daemon=True
+            )
+            self.control_listener_thread.start()
+            logging.info("Control bus listener started")
         else:
-            logging.warning("No CAN bus available. Starting in demo mode.")
-            #self.start_demo_mode()
+            logging.warning("No control CAN bus available")
+
+        # Start logging bus listener  
+        if self.logging_bus:
+            self.logging_listener_thread = threading.Thread(
+                target=self.setup_can_listener, 
+                args=(self.logging_bus, "logging"),
+                daemon=True
+            )
+            self.logging_listener_thread.start()
+            logging.info("Logging bus listener started")
+        else:
+            logging.warning("No logging CAN bus available")
+
+        # Start demo mode if no real buses are available
+        if not self.control_bus and not self.logging_bus:
+            logging.warning("No CAN buses available. Consider starting demo mode.")
+
+    def setup_can_listener(self, bus, bus_name):
+        """
+        Creates a 'can.Notifier' which will call 'self.process_can_message'
+        every time a new CAN frame arrives on the specified bus.
+        """
+        if bus:
+            try:
+                notifier = can.Notifier(bus, [lambda msg: self.process_can_message(msg, bus_name)])
+                logging.info(f"CAN listener successfully set up for {bus_name} bus in Controller.")
+            except Exception as e:
+                logging.error(f"Failed to set up CAN listener for {bus_name} bus: {e}")
+        else:
+            logging.error(f"No {bus_name} CAN bus available. Cannot listen for messages.")
+
+    def process_can_message(self, msg, bus_name="unknown"):
+        """
+        Forward incoming CAN frames to the model for decoding and value updates.
+        Includes bus identification for logging and debugging.
+        """
+        try:
+            # Log message reception for debugging
+            logging.debug(f"Received message on {bus_name} bus: ID=0x{msg.arbitration_id:03X}")
+            
+            # Forward to model for processing
+            self.model.process_can_message(msg)
+        except Exception as e:
+            logging.error(f"Error processing CAN message from {bus_name} bus: {e}")
+
+    def determine_message_bus(self, msg_id):
+        """
+        Determine which bus a message should be sent on based on H20 CAN ID specification.
+        """
+        if 0x240 <= msg_id <= 0x32F:
+            return "control"
+        elif 0x330 <= msg_id <= 0x4FF:
+            return "logging" 
+        elif msg_id in [0x516, 0x022, 0x023, 0x025]:  # Special control bus messages
+            return "control"
+        elif msg_id in range(0x518, 0x521):  # Software versions on logging
+            return "logging"
+        else:
+            return "unknown"
+
+    def send_message_on_correct_bus(self, msg_id, data):
+        """
+        Send message on the appropriate bus based on message ID.
+        """
+        bus_type = self.determine_message_bus(msg_id)
+        
+        if bus_type == "control" and self.control_bus:
+            return self._send_on_bus(self.control_bus, msg_id, data, "control")
+        elif bus_type == "logging" and self.logging_bus:
+            return self._send_on_bus(self.logging_bus, msg_id, data, "logging")
+        else:
+            logging.warning(f"Cannot send message 0x{msg_id:03X} - {bus_type} bus not available")
+            return False
+
+    def _send_on_bus(self, bus, msg_id, data, bus_name):
+        """
+        Helper method to send message on specific bus.
+        """
+        try:
+            msg = can.Message(arbitration_id=msg_id, data=data, is_extended_id=False)
+            bus.send(msg)
+            logging.info(f"Message sent on {bus_name} bus: {msg}")
+            return True
+        except Exception as e:
+            logging.error(f"Error sending message on {bus_name} bus: {e}")
+            return False
 
     def setup_button_actions(self):
         """
@@ -99,46 +202,8 @@ class Controller:
             if hasattr(self.view, 'button8') and self.view.button8 is not None:
                 self.view.button8.config(command=self.show_ecu_screen)
                 
-            # Event selection buttons
-            if hasattr(self.view, 'button4') and self.view.button4 is not None:
-                self.view.button4.config(command=lambda: self.change_event_and_close_menu("autocross"))
-                
-            if hasattr(self.view, 'button5') and self.view.button5 is not None:
-                self.view.button5.config(command=lambda: self.change_event_and_close_menu("endurance"))
-                
-            if hasattr(self.view, 'button6') and self.view.button6 is not None:
-                self.view.button6.config(command=lambda: self.change_event_and_close_menu("acceleration"))
-                
-            if hasattr(self.view, 'button7') and self.view.button7 is not None:
-                self.view.button7.config(command=lambda: self.change_event_and_close_menu("skidpad"))
-                
-            if hasattr(self.view, 'button8') and self.view.button8 is not None:
-                self.view.button8.config(command=lambda: self.change_event_and_close_menu("practice"))
-                
         except Exception as e:
             logging.error(f"Error setting up menu buttons: {e}")
-
-    def setup_can_listener(self):
-        """
-        Creates a 'can.Notifier' which will call 'self.process_can_message'
-        every time a new CAN frame arrives on the bus.
-        """
-        if self.can_bus:
-            try:
-                self.notifier = can.Notifier(self.can_bus, [self.process_can_message])
-                logging.info("CAN listener successfully set up in Controller.")
-            except Exception as e:
-                logging.error(f"Failed to set up CAN listener: {e}")
-                # self.start_demo_mode()  # Don't auto-start demo mode on failure
-        else:
-            logging.error("No CAN bus available. Cannot listen for messages.")
-            # self.start_demo_mode()  # Don't auto-start demo mode when no bus
-
-    def process_can_message(self, msg):
-        """
-        Forward incoming CAN frames to the model for decoding and value updates.
-        """
-        self.model.process_can_message(msg)
 
     def toggle_demo_mode(self):
         """
@@ -157,7 +222,6 @@ class Controller:
     
     def start_demo_mode(self):
         """Start the demo mode thread that generates random values"""
-        # First check if we have a thread and if it's alive
         if self.demo_thread is None or not self.demo_thread.is_alive():
             self.demo_mode = True
             try:
@@ -170,13 +234,12 @@ class Controller:
     def stop_demo_mode(self):
         """Stop the demo mode thread"""
         self.demo_mode = False
-        # Thread will exit on its own when demo_mode becomes False
         logging.info("Demo mode stopped")
     
     def run_demo_updates(self):
         """
         Generate random updates for various car parameters.
-        This is used for testing when no real CAN bus is available.
+        This simulates data that would normally come from CAN buses.
         """
         try:
             while self.demo_mode:
@@ -228,51 +291,16 @@ class Controller:
         except Exception as e:
             logging.error(f"Error updating {key}: {e}")
 
-    def random_update_value(self):
-        """
-        Picks a random valid param ID from the current event's layout
-        and assigns it a random value (0..100).
-        """
-        layout = self.model.event_screens.get(self.model.current_event, [])
-        # Flatten the layout to a list of strings that match model.values keys
-        param_ids = self._extract_param_ids(layout)
-        if not param_ids:
-            return  # no valid param to update
-
-        key = random.choice(param_ids)  # pick a random param ID (string)
-        value = int(random.uniform(0, 100))
-        self.model.update_value(key, value)
-
-    def _extract_param_ids(self, structure):
-        """
-        Recursively traverse the event_screens structure to find all valid param IDs.
-        Returns a list of strings that can be updated in self.model.values.
-        """
-        found = []
-
-        # If 'structure' is a list:
-        if isinstance(structure, list):
-            for item in structure:
-                # Recurse on each element
-                found.extend(self._extract_param_ids(item))
-
-        # If 'structure' is a dict describing a single panel:
-        elif isinstance(structure, dict):
-            raw_id = structure.get("id")
-            # If it has an 'id' that is actually in model.values, we treat it as valid
-            if raw_id and raw_id in self.model.values:
-                found.append(raw_id)
-            # Or if no 'id' but there's a 'name' that matches a model key
-            elif not raw_id and "name" in structure and structure["name"] in self.model.values:
-                found.append(structure["name"])
-
-        # If 'structure' is a string:
-        elif isinstance(structure, str):
-            # If it matches a key in model.values, keep it
-            if structure in self.model.values:
-                found.append(structure)
-
-        return found
+    def toggle_logo(self):
+        """Toggle logo blinking for visual feedback"""
+        try:
+            if hasattr(self.view, 'toggle_logo'):
+                self.view.toggle_logo()
+        except Exception as e:
+            logging.error(f"Error toggling logo: {e}")
+        finally:
+            # Schedule next toggle regardless of errors
+            self.view.after(1500, self.toggle_logo)
 
     def update_value(self, key, value):
         """
@@ -374,10 +402,11 @@ class Controller:
                 # Quit the application
                 self.view.quit()
             elif key == 's':
-                # Show settings screen (new mapping)
-                self.view.show_menu_screen(self.view.menu_main_frame)
+                # Show settings screen
+                if hasattr(self.view, 'show_menu_screen') and hasattr(self.view, 'menu_main_frame'):
+                    self.view.show_menu_screen(self.view.menu_main_frame)
             elif key == 'f':
-                # Toggle fullscreen (new mapping)
+                # Toggle fullscreen
                 self.toggle_fullscreen()
         except Exception as e:
             logging.error(f"Error handling key press {event.keysym}: {e}")
@@ -386,64 +415,68 @@ class Controller:
         """Toggle fullscreen mode"""
         if hasattr(self.view, 'attributes'):
             try:
-                # Toggle fullscreen state
-                self.view.attributes("-fullscreen", not self.view.attributes("-fullscreen"))
-                logging.info(f"Fullscreen toggled")
+                current_state = self.view.attributes("-fullscreen")
+                self.view.attributes("-fullscreen", not current_state)
+                logging.info(f"Fullscreen {'enabled' if not current_state else 'disabled'}")
             except Exception as e:
                 logging.error(f"Error toggling fullscreen: {e}")
 
     def change_max_torque(self, amount):
-        """Change the maximum torque setting"""
+        """Change the maximum torque setting via CAN message"""
         current_torque = self.model.get_value("Max Torque") or 0
         new_torque = min(100, max(0, current_torque + amount))
         self.update_value("Max Torque", new_torque)
+        
+        # Send CAN message to update torque setting (Control Bus)
+        try:
+            # This uses a hypothetical message ID for torque control
+            msg_id = 0x2B5  # DIU_Change_Torque_Request (Control Bus)
+            torque_data = int(new_torque).to_bytes(2, 'little')
+            data = list(torque_data) + [0] * 6  # Pad to 8 bytes
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info(f"Sent torque change request: {new_torque} Nm")
+        except Exception as e:
+            logging.error(f"Failed to send torque change message: {e}")
     
     def change_max_power(self, amount):
-        """Change the maximum power setting"""
-        # This setting might not have a direct parameter in the model,
-        # so we log a notification and implement a direct CAN message send if needed
+        """Change the maximum power setting via CAN message"""
         logging.info(f"Maximum power changed by {amount}")
         
-        # Example of sending a CAN message if we have a bus and protocol for this
-        if self.can_bus:
-            try:
-                # This is an example - actual implementation would depend on the car's CAN protocol
-                arbitration_id = 0x123  # Replace with actual ID for power control
-                data = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # Replace with actual data format
-                msg = can.Message(arbitration_id=arbitration_id, data=data, is_extended_id=False)
-                self.can_bus.send(msg)
-                logging.info(f"Sent power control message: {msg}")
-            except Exception as e:
-                logging.error(f"Failed to send power control message: {e}")
+        # Send CAN message for power control (Control Bus)
+        try:
+            msg_id = 0x2B4  # Hypothetical power control message (Control Bus)
+            power_data = int(amount).to_bytes(2, 'little')
+            data = list(power_data) + [0] * 6  # Pad to 8 bytes
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info(f"Sent power control message: {amount}")
+        except Exception as e:
+            logging.error(f"Failed to send power control message: {e}")
     
     def calibrate_throttle_upper(self):
         """Calibrate the upper threshold of the throttle position sensor"""
         logging.info("Calibrating throttle position upper threshold")
-        # This would typically send a specific CAN message to the throttle controller
-        if self.can_bus:
-            try:
-                # Example - actual implementation depends on the car's protocol
-                arbitration_id = 0x694  # DIU_Calibrate_APPS_Request
-                data = [0x01]  # Command for upper calibration
-                msg = can.Message(arbitration_id=arbitration_id, data=data, is_extended_id=False)
-                self.can_bus.send(msg)
-                logging.info(f"Sent throttle upper calibration message: {msg}")
-            except Exception as e:
-                logging.error(f"Failed to send throttle calibration message: {e}")
+        
+        # Send CAN message for upper throttle calibration (Control Bus)
+        try:
+            msg_id = 0x2B6  # DIU_Calibrate_APPS_Request (Control Bus)
+            data = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # Command for upper calibration
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent throttle upper calibration message")
+        except Exception as e:
+            logging.error(f"Failed to send throttle calibration message: {e}")
     
     def calibrate_throttle_lower(self):
         """Calibrate the lower threshold of the throttle position sensor"""
         logging.info("Calibrating throttle position lower threshold")
-        # Similar to upper calibration but with a different command value
-        if self.can_bus:
-            try:
-                arbitration_id = 0x694  # DIU_Calibrate_APPS_Request
-                data = [0x02]  # Command for lower calibration
-                msg = can.Message(arbitration_id=arbitration_id, data=data, is_extended_id=False)
-                self.can_bus.send(msg)
-                logging.info(f"Sent throttle lower calibration message: {msg}")
-            except Exception as e:
-                logging.error(f"Failed to send throttle calibration message: {e}")
+        
+        # Send CAN message for lower throttle calibration (Control Bus)
+        try:
+            msg_id = 0x2B6  # DIU_Calibrate_APPS_Request (Control Bus)
+            data = [0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # Command for lower calibration
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent throttle lower calibration message")
+        except Exception as e:
+            logging.error(f"Failed to send throttle calibration message: {e}")
     
     def show_debug_screen(self):
         """Show the debugging screen"""
@@ -462,141 +495,192 @@ class Controller:
                 logging.error(f"Error showing ECU screen: {e}")
     
     def cycle_tc_mode(self):
-        """Cycle through traction control modes"""
+        """Cycle through traction control modes and send CAN message"""
         self.current_tc_mode = (self.current_tc_mode + 1) % len(self.tc_modes)
-        self.update_value("Traction Control Mode", self.tc_modes[self.current_tc_mode])
+        new_mode = self.tc_modes[self.current_tc_mode]
+        self.update_value("Traction Control Mode", new_mode)
+        
+        # Send CAN message to update TC mode (Control Bus)
+        try:
+            msg_id = 0x280  # VCU Control message for TC (Control Bus)
+            tc_value = self.current_tc_mode
+            data = [tc_value, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info(f"Sent TC mode change: {new_mode}")
+        except Exception as e:
+            logging.error(f"Failed to send TC mode message: {e}")
     
     def cycle_tv_mode(self):
-        """Cycle through torque vectoring modes"""
+        """Cycle through torque vectoring modes and send CAN message"""
         self.current_tv_mode = (self.current_tv_mode + 1) % len(self.tv_modes)
-        self.update_value("Torque Vectoring Mode", self.tv_modes[self.current_tv_mode])
+        new_mode = self.tv_modes[self.current_tv_mode]
+        self.update_value("Torque Vectoring Mode", new_mode)
+        
+        # Send CAN message to update TV mode (Control Bus)
+        try:
+            msg_id = 0x281  # VCU Control message for TV (Control Bus)
+            tv_value = self.current_tv_mode
+            data = [tv_value, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info(f"Sent TV mode change: {new_mode}")
+        except Exception as e:
+            logging.error(f"Failed to send TV mode message: {e}")
 
     def _on_cell_voltage_update(self, global_idx, value):
         """
-        Update the stored voltage for the cell identified by 'global_idx' (0..119).
+        Update the stored voltage for the cell identified by 'global_idx'.
         Then compute the lowest voltage across all known cells.
         """
         try:
-            self.cell_voltages[global_idx] = value
+            # Apply the conversion factor from the DBC: raw * 0.01 + 2.5
+            actual_voltage = (value * 0.01) + 2.5
+            self.cell_voltages[global_idx] = actual_voltage
 
             # Only compute min if we have at least 1 known cell
             if self.cell_voltages:
                 lowest_voltage = min(self.cell_voltages.values())
-                self.update_value("Lowest Cell", lowest_voltage)
+                self.update_value("Lowest Cell", round(lowest_voltage, 3))
         except Exception as e:
             logging.error(f"Error updating cell voltage {global_idx}: {e}")
             
     def handle_ok_button(self):
         """
-        Handle the 'OK' button press from the steering wheel.
-        This is a new method for the SWU button input.
+        Handle the 'OK' button press from the steering wheel (Control Bus).
         """
         logging.info("SWU: OK button pressed")
-    
+        
         # If in a menu, select the currently highlighted item
         if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
             # Find the currently highlighted button and click it
-            for i, button in enumerate(self.view.main_menu_button_list):
-                if i == self.view.active_button:
-                    button.invoke()
+            if hasattr(self.view, 'main_menu_button_list') and hasattr(self.view, 'active_button'):
+                try:
+                    active_button = self.view.main_menu_button_list[self.view.active_button]
+                    active_button.invoke()
                     return
+                except (IndexError, AttributeError):
+                    pass
             
         # Otherwise toggle menu 
         self.menu_toggle()
 
     def handle_up_button(self):
         """
-        Handle the 'Up' button press from the steering wheel.
-        This is a new method for the SWU button input.
+        Handle the 'Up' button press from the steering wheel (Control Bus).
         """
         logging.info("SWU: Up button pressed")
         
         # If in a menu, move highlight up
         if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
-            new_index = (self.view.active_button - 1) % len(self.view.main_menu_button_list)
-            if hasattr(self.view, '_highlight_main_menu_button'):
-                self.view._highlight_main_menu_button(new_index)
+            if hasattr(self.view, 'main_menu_button_list') and hasattr(self.view, 'active_button'):
+                try:
+                    new_index = (self.view.active_button - 1) % len(self.view.main_menu_button_list)
+                    if hasattr(self.view, '_highlight_main_menu_button'):
+                        self.view._highlight_main_menu_button(new_index)
+                except AttributeError:
+                    pass
         else:
             # Toggle DRS when not in menu
             current_drs = self.model.get_value("DRS")
             new_drs = "Off" if current_drs == "On" else "On"
             self.update_value("DRS", new_drs)
+            
+            # Send DRS control message (Control Bus)
+            try:
+                msg_id = 0x2C0  # DRS Control message (Control Bus)
+                drs_value = 1 if new_drs == "On" else 0
+                data = [drs_value, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+                self.send_message_on_correct_bus(msg_id, data)
+                logging.info(f"Sent DRS control: {new_drs}")
+            except Exception as e:
+                logging.error(f"Failed to send DRS message: {e}")
 
     def handle_down_button(self):
         """
-        Handle the 'Down' button press from the steering wheel.
-        This is a new method for the SWU button input.
+        Handle the 'Down' button press from the steering wheel (Control Bus).
         """
         logging.info("SWU: Down button pressed")
         
         # If in a menu, move highlight down
         if hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped():
-            new_index = (self.view.active_button + 1) % len(self.view.main_menu_button_list)
-            if hasattr(self.view, '_highlight_main_menu_button'):
-                self.view._highlight_main_menu_button(new_index)
+            if hasattr(self.view, 'main_menu_button_list') and hasattr(self.view, 'active_button'):
+                try:
+                    new_index = (self.view.active_button + 1) % len(self.view.main_menu_button_list)
+                    if hasattr(self.view, '_highlight_main_menu_button'):
+                        self.view._highlight_main_menu_button(new_index)
+                except AttributeError:
+                    pass
         else:
-            # Default action when not in menu: cycle traction control mode
+            # Cycle traction control mode when not in menu
             self.cycle_tc_mode()
 
     def toggle_cooling(self):
         """
-        Toggle cooling system via the steering wheel button.
-        This is a new method for the SWU button input.
+        Toggle cooling system via the steering wheel button (Control Bus).
         """
         logging.info("SWU: Cooling button pressed")
         
-        # Send a CAN message to toggle the cooling system
-        if self.can_bus:
-            try:
-                # Construct a message with ID 643 (VCU_PDU_Control) to toggle cooling
-                # The cooling system bit is at bit 2 (VCU_cooling_system_active)
-                arbitration_id = 0x643  # VCU_PDU_Control
-                # Read current status first
-                current_status = [0] * 8
-                # Toggle bit 2 (cooling system active)
-                cooling_active = 1  # Assume we want to turn it on
-                data = bytearray([0x00, 0x00])
-                data[0] |= (cooling_active << 2)
-                
-                # Send the message
-                msg = can.Message(arbitration_id=arbitration_id, data=data, is_extended_id=False)
-                self.can_bus.send(msg)
-                logging.info("Sent cooling toggle message")
-            except Exception as e:
-                logging.error(f"Error sending cooling toggle message: {e}")
+        # Send CAN message to toggle the cooling system (Control Bus)
+        try:
+            msg_id = 0x282  # VCU PDU Control message (Control Bus)
+            # Toggle bit 2 (cooling system active)
+            cooling_active = 1  # Assume we want to turn it on
+            data = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+            data[0] |= (cooling_active << 2)
+            
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent cooling toggle message")
+        except Exception as e:
+            logging.error(f"Error sending cooling toggle message: {e}")
 
     def toggle_ts(self):
         """
-        Toggle traction system via the steering wheel button.
-        This is a new method for the SWU button input.
+        Toggle traction system via the steering wheel button (Control Bus).
         """
         logging.info("SWU: TS button pressed")
-        # This would typically send a message to the appropriate controller
-        # to toggle the traction system power
+        
+        # Send TS control message (Control Bus)
+        try:
+            msg_id = 0x2A0  # ASCU Control message (Control Bus)
+            data = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # TS_On_Button request
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent TS control message")
+        except Exception as e:
+            logging.error(f"Error sending TS message: {e}")
 
     def toggle_r2d(self):
         """
-        Toggle Ready-to-Drive mode via the steering wheel button.
-        This is a new method for the SWU button input.
+        Toggle Ready-to-Drive mode via the steering wheel button (Control Bus).
         """
         logging.info("SWU: R2D button pressed")
-        # This would typically send a message to enter Ready-to-Drive mode
-        # Often this requires a specific sequence of actions
+        
+        # Send R2D control message (Control Bus)
+        try:
+            msg_id = 0x283  # VCU R2D Control message (Control Bus)
+            data = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # R2D active
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent R2D control message")
+        except Exception as e:
+            logging.error(f"Error sending R2D message: {e}")
 
     def perform_reset(self):
         """
-        Perform a general reset via the steering wheel button.
-        This is a new method for the SWU button input.
+        Perform a general reset via the steering wheel button (Control Bus).
         """
         logging.info("SWU: Reset button pressed")
-        # This would typically reset various subsystems
-        # For safety, might require a confirmation dialog
         
+        # Send overall reset message (Control Bus)
+        try:
+            msg_id = 0x2B3  # DIU Channel_Reset_Request (Control Bus)
+            # Reset all systems (set all bits)
+            data = [0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]
+            self.send_message_on_correct_bus(msg_id, data)
+            logging.info("Sent overall reset message")
+        except Exception as e:
+            logging.error(f"Error sending reset message: {e}")
         
-    # Add to Controller.py
     def update_switch_state(self, switch_num, value):
         """
-        Handle switch state changes from the SWU (Switch Wheel Unit)
+        Handle switch state changes from the SWU (Switch Wheel Unit) (Control Bus).
         
         Args:
             switch_num: Which switch changed (1-5)
@@ -606,18 +690,20 @@ class Controller:
         
         # Map switch positions to meaningful values
         if switch_num == 1:  # Traction Control Mode switch
-            modes = ["Off", "Dry", "Wet", "Snow", "Custom", "Auto"]
-            if 0 <= value < len(modes):
+            if 0 <= value < len(self.tc_modes):
                 self.current_tc_mode = value
-                self.update_value("Traction Control Mode", modes[value])
+                self.update_value("Traction Control Mode", self.tc_modes[value])
+                # Send TC mode via CAN
+                self.cycle_tc_mode()
             else:
                 self.update_value("Traction Control Mode", f"Mode {value}")
         
         elif switch_num == 2:  # Torque Vectoring Mode switch
-            modes = ["Off", "Low", "Medium", "High", "Custom"]
-            if 0 <= value < len(modes):
+            if 0 <= value < len(self.tv_modes):
                 self.current_tv_mode = value
-                self.update_value("Torque Vectoring Mode", modes[value])
+                self.update_value("Torque Vectoring Mode", self.tv_modes[value])
+                # Send TV mode via CAN
+                self.cycle_tv_mode()
             else:
                 self.update_value("Torque Vectoring Mode", f"Mode {value}")
         
@@ -626,15 +712,15 @@ class Controller:
 
     def handle_dtu_error(self, error_code):
         """
-        Handle DTU error codes as defined in the DBC file
+        Handle DTU error codes as defined in the DBC file (Logging Bus).
         
         Args:
             error_code: The DTU error code (0-42)
         """
-        # Map of error codes to descriptive messages
+        # Map of error codes to descriptive messages (from H20 DBC)
         error_messages = {
             0: "RF_HW_INIT_FAILED",
-            1: "RF_SPI_HAL_ERROR_CB",
+            1: "RF_SPI_HAL_ERROR_CB", 
             2: "RF_SPI_TRANSM_START_FAILED",
             3: "RF_TX_PAYLOAD_OVER_MAX_LEN",
             4: "RF_INCORRECT_IRQ_FLAGS",
@@ -642,7 +728,12 @@ class Controller:
             6: "DTUPROT_COMPR_CAN_FROM_STATION",
             7: "DTUPROT_COMPR_CAN_NO_ENTRY",
             8: "SETTINGS_EE_INIT_FAILED",
-            # Add more as needed, or load dynamically from DBC file
+            9: "SETTINGS_EE_WRITE_FAILED",
+            10: "SETTINGS_EE_READ_FAILED",
+            11: "SETTINGS_EE_FORMAT_FAILED",
+            12: "SETTINGS_RX_RECONF_FREQUENTLY",
+            13: "SETTINGS_TIMEOUT_START_HAL_FAIL",
+            # Add more as needed from the DBC file
         }
         
         # Get error message, or use a generic one if not found
@@ -661,7 +752,7 @@ class Controller:
 
     def update_pdu_fault(self, component, is_fault):
         """
-        Update PDU fault status. This handles the individual fault bits from ID 911.
+        Update PDU fault status from Logging Bus messages.
         
         Args:
             component: Component name (e.g., "VLU", "InverterR")
@@ -673,11 +764,8 @@ class Controller:
         fault_key = f"PDU_Fault_{component}"
         self.update_value(fault_key, is_fault)
         
-        # Update a master fault status
-        all_faults = {k: v for k, v in self.model.values.items() if k.startswith("PDU_Fault_") and v}
-        
-        if is_fault:
-            # Critical fault handling
-            if component in ["InverterR", "InverterL", "VCU", "AMS", "ASMS"]:
-                if hasattr(self.view, 'show_debug_message'):
-                    self.view.show_debug_message(f"CRITICAL FAULT: {component}")
+        # Check for critical faults and take action
+        if is_fault and component in ["InverterR", "InverterL", "VCU", "AMS", "ASMS"]:
+            logging.warning(f"CRITICAL FAULT DETECTED: {component}")
+            if hasattr(self.view, 'show_debug_message'):
+                self.view.show_debug_message(f"CRITICAL FAULT: {component}")
