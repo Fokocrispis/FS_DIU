@@ -8,7 +8,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("DIU.log"),
+    #    logging.FileHandler("DIU.log"),
         logging.StreamHandler()
     ]
 )
@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description="Hawks Display - Formula Student Car Interface")
     parser.add_argument("--virtual", action="store_true", help="Use virtual CAN (vcan0/vcan1) instead of real CAN")
     parser.add_argument("--demo", action="store_true", help="Run in demo mode with simulated values")
-    parser.add_argument("--dbc", type=str, default="H20_CAN_dbc.dbc", help="Path to DBC file")
+    parser.add_argument("--dbc", type=str, default="can-messages/H20_CANoe_Project/H20_CAN_dbc.dbc", help="Path to DBC file")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     parser.add_argument("--control-channel", type=str, default="can0", help="Control CAN bus channel (default: can0)")
     parser.add_argument("--logging-channel", type=str, default="can1", help="Logging CAN bus channel (default: can1)")
@@ -39,7 +39,7 @@ def main():
         args.control_channel = "vcan0"
         args.logging_channel = "vcan1"
         logging.info("Using virtual CAN channels: vcan0 (control), vcan1 (logging)")
-    
+
     # Import components after parsing arguments
     try:
         from can_model import CANModel, AllMsg

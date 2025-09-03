@@ -29,6 +29,10 @@ class Controller:
         self.demo_mode = False
         self.demo_thread = None  # Initialize the demo thread reference
         
+        # Screen state management
+        self.current_screen_state = "tsoff"  # Track current screen: "tsoff", "event", "menu"
+        self.current_event_name = None  # Track which event screen is active
+        
         # State tracking for traction control and torque vectoring modes
         self.tc_modes = ["Off", "Dry", "Wet", "Snow", "Custom", "Auto"]
         self.tv_modes = ["Off", "Low", "Medium", "High", "Custom"]
@@ -39,12 +43,16 @@ class Controller:
         self.update_value("Traction Control Mode", self.tc_modes[self.current_tc_mode])
         self.update_value("Torque Vectoring Mode", self.tv_modes[self.current_tv_mode])
 
-        # Bind model callbacks to the view's update methods
+        # Bind model callbacks
+        # Use separate callbacks to avoid interference
         self.model.bind_value_changed(self.view.handle_value_update)
         self.model.bind_event_changed(self.view.create_event_screen)
+        
+        # Register specific callback only for TS On changes
+        self._register_ts_on_callback()
 
         # Configure view button actions if they exist
-        self.setup_button_actions()
+       # self.setup_button_actions()
 
         # Key bindings from the view
         self.view.bind("<Key>", self.handle_key_press)
@@ -53,9 +61,257 @@ class Controller:
         # Start CAN listeners in separate threads for both buses
         self.setup_dual_can_listeners()
 
+        self.toggle_fullscreen()
+
         # Blink logo for visual feedback
         self.logo_blink_state = True
         self.view.after(1000, self.toggle_logo)
+        
+        # Initialize screen state (View starts with TS off screen)
+        self.current_screen_state = "tsoff"
+        self.current_event_name = None
+
+    def _register_ts_on_callback(self):
+        """Register a specific callback that only triggers for TS On changes"""
+        def ts_on_only_callback(key, value):
+            if key == "TS On":
+                self.handle_screen_change(key, value)
+        
+        self.model.bind_value_changed(ts_on_only_callback)
+
+    # Callback for TS On update to change event
+    def handle_screen_change(self, key, value):
+        # This callback is now only called for "TS On" changes
+        logging.info(f"TS On change detected: {key} = {value}")
+        
+        # Debug current state before processing
+        self._debug_current_state()
+            
+        if value == 1:
+            drivemode = self.model.get_value("Drivemode")
+            logging.info(f"TS On = 1 detected, Drivemode = {drivemode}")
+            
+            # Check if we have a valid drivemode
+            if drivemode and drivemode != "unknown":
+                # Only switch if we're not already in the correct event screen
+                if self.current_screen_state != "event" or self.current_event_name != drivemode:
+                    logging.info(f"Switching to {drivemode} event due to TS On = 1")
+                    self._switch_to_event_screen(drivemode)
+                else:
+                    logging.info(f"Already in {drivemode} event screen, no switch needed")
+            else:
+                # If no valid drivemode, ensure we're in TS off screen
+                logging.info("No valid drivemode found, ensuring TS off screen")
+                if self.current_screen_state != "tsoff":
+                    self._switch_to_tsoff_screen()
+                    
+        elif value == 0:
+            # Only show TS off screen if we're not already in TS off screen
+            if self.current_screen_state != "tsoff":
+                logging.info("Showing TS off screen due to TS On = 0")
+                self._switch_to_tsoff_screen()
+            else:
+                logging.info("TS On = 0 but already in TS off screen - ignoring")
+        
+        # Debug state after processing
+        self._debug_current_state()
+
+    def _switch_to_event_screen(self, drivemode):
+        """Switch to the event screen for the given drivemode, but only if necessary."""
+        try:
+            logging.info(f"Switching to event screen: {drivemode}")
+            
+            # Step 1: Update our state tracking
+            self.current_screen_state = "event"
+            self.current_event_name = drivemode
+            
+            # Step 2: Ensure we're not in any menu (only if necessary)
+            if self._is_in_menu_screen() or self._is_in_tsoff_screen():
+                logging.info("Leaving menu/TS off screen to show event screen")
+                self.view.return_to_event_screen()
+            
+            # Step 3: Change the event in the model (only if different)
+            if self.model.current_event != drivemode:
+                logging.info(f"Changing model event from {self.model.current_event} to {drivemode}")
+                self.model.change_event(drivemode)
+            else:
+                logging.info(f"Model already set to {drivemode}, no change needed")
+            
+            # Step 4: Create event screen only if it doesn't exist or is different
+            if (not self.view.current_screen or 
+                not hasattr(self.view.current_screen, 'event_name') or 
+                self.view.current_screen.event_name != drivemode):
+                logging.info(f"Creating new event screen for {drivemode}")
+                self.view.create_event_screen(drivemode)
+            else:
+                logging.info(f"Event screen for {drivemode} already exists, reusing")
+            
+            # Step 5: Ensure the main UI is visible (only if necessary)
+            if not self.view.split_frame.winfo_ismapped():
+                logging.info("Showing main UI frames")
+                self.view.return_to_event_screen()
+                
+            logging.info(f"Successfully ensured {drivemode} event screen is active")
+            
+        except Exception as e:
+            logging.error(f"Error switching to event screen for {drivemode}: {e}")
+            # Reset state on error
+            self.current_screen_state = "unknown"
+            self.current_event_name = None
+    
+    def _switch_to_tsoff_screen(self):
+        """Switch to the TS off screen, but only if necessary."""
+        try:
+            logging.info("Switching to TS off screen")
+            
+            # Update our state tracking
+            self.current_screen_state = "tsoff"
+            self.current_event_name = None
+            
+            # Only switch if we're not already in TS off screen
+            if not self._is_in_tsoff_screen():
+                logging.info("Showing TS off screen")
+                self.view.show_tsoff_screen()
+            else:
+                logging.info("Already in TS off screen, no switch needed")
+                
+        except Exception as e:
+            logging.error(f"Error switching to TS off screen: {e}")
+            # Reset state on error
+            self.current_screen_state = "unknown"
+            self.current_event_name = None
+
+    def _debug_current_state(self):
+        """Debug method to log current screen state"""
+        logging.info(f"Current screen state: {self.current_screen_state}")
+        logging.info(f"Current event name: {self.current_event_name}")
+        logging.info(f"View current screen: {getattr(self.view.current_screen, 'event_name', 'None') if self.view.current_screen else 'None'}")
+        logging.info(f"Model current event: {self.model.current_event}")
+        logging.info(f"Is in TS off: {self._is_in_tsoff_screen()}")
+        logging.info(f"Is in menu: {self._is_in_menu_screen()}")
+
+    def _ensure_event_screen_visible(self, event_name):
+        """Ensure that the event screen is visible and not overridden by menus"""
+        try:
+            # Double-check that we're showing the correct event screen
+            if not self._is_in_tsoff_screen() and not self._is_in_menu_screen():
+                logging.info(f"Event screen for {event_name} should be visible")
+            else:
+                logging.warning(f"Event screen not visible, forcing return to event screen")
+                self.view.return_to_event_screen()
+        except Exception as e:
+            logging.error(f"Error ensuring event screen visibility: {e}")
+
+            # DOES NOT WORK AS INTENDET ATM
+            # if key == "Menu" and value == 1:
+            #     # Only show debug screen if we're not already in a menu
+            #     if not self._is_in_menu_screen():
+            #         logging.info("Showing debug screen due to Menu button press")
+            #         self.view.show_debug_screen()
+            #     else:
+            #         logging.info("Menu button pressed but already in menu screen - ignoring")
+
+            # if key == "Menu" and value == 0:
+            #     logging.info("Hiding debug screen due to Menu button release")
+            #     self.view.hide_debug_screen()
+
+            # if key == "Up" and value == 1 and self._is_in_menu_screen():
+            #     # set upper pedal position
+            #     upper_pos = self.model.get_value("apps_modified")
+            # if key == "Down" and value == 1 and self._is_in_menu_screen():
+            #     # set lower pedal position
+            #     lower_pos = self.model.get_value("apps_modified")
+            # if key == "Ok" and value == 1 and self._is_in_menu_screen():
+            #     return  # Do nothing if Ok is pressed in menu
+            #     # send CAN message to set upper/lower pedal position
+            #     #msg_id = 0x2B6  # DIU_Calibrate_APPS_Request (Control Bus)
+            #     #data = (upper_pos, lower_pos)
+            #     #self.send_on_bus(self.control_bus, msg_id, data, "logging")
+
+    def _is_in_menu_screen(self):
+        """
+        Check if we're currently in any menu screen.
+        Returns True if any menu frame is currently mapped/visible.
+        """
+        return (self._is_in_screen('menu') or 
+                self._is_in_screen('debug') or 
+                self._is_in_screen('ecu'))
+
+    def _is_in_tsoff_screen(self):
+        """
+        Check if we're currently in the TS off screen.
+        Returns True if the TS off screen is currently visible.
+        """
+        return self._is_in_screen('tsoff')
+
+    def _is_in_screen(self, screen_name):
+        """
+        Generic function to check if we're currently in a specific screen.
+        
+        Args:
+            screen_name: Name of the screen to check (e.g., 'menu', 'tsoff', 'debug', 'ecu')
+        
+        Returns:
+            bool: True if currently in the specified screen, False otherwise
+        """
+        try:
+            screen_name = screen_name.lower()
+            
+            # Check for menu screens
+            if screen_name in ['menu', 'main_menu']:
+                return hasattr(self.view, 'menu_main_frame') and self.view.menu_main_frame.winfo_ismapped()
+            
+            elif screen_name in ['debug', 'debug_menu']:
+                return hasattr(self.view, 'menu_debug_frame') and self.view.menu_debug_frame.winfo_ismapped()
+            
+            elif screen_name in ['ecu', 'ecu_menu']:
+                return hasattr(self.view, 'menu_ecu_frame') and self.view.menu_ecu_frame.winfo_ismapped()
+            
+            # Check for TS off screen
+            elif screen_name in ['tsoff', 'ts_off']:
+                if hasattr(self.view, 'tsoff_frame') and self.view.tsoff_frame.winfo_ismapped():
+                    return True
+                if hasattr(self.view, 'ts_off_frame') and self.view.ts_off_frame.winfo_ismapped():
+                    return True
+                if hasattr(self.view, 'current_screen') and getattr(self.view, 'current_screen', None) == 'tsoff':
+                    return True
+            
+            # Generic frame check - try common naming patterns
+            else:
+                # Try direct frame name
+                frame_attr = f"{screen_name}_frame"
+                if hasattr(self.view, frame_attr):
+                    frame = getattr(self.view, frame_attr)
+                    if hasattr(frame, 'winfo_ismapped') and frame.winfo_ismapped():
+                        return True
+                
+                # Try menu_ prefix
+                menu_frame_attr = f"menu_{screen_name}_frame"
+                if hasattr(self.view, menu_frame_attr):
+                    frame = getattr(self.view, menu_frame_attr)
+                    if hasattr(frame, 'winfo_ismapped') and frame.winfo_ismapped():
+                        return True
+                
+                # Check current_screen attribute
+                if hasattr(self.view, 'current_screen') and getattr(self.view, 'current_screen', None) == screen_name:
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            logging.error(f"Error checking screen state for '{screen_name}': {e}")
+            return False
+
+    def handle_menu_action(self, panel_id, value):
+        """
+        Handle menu actions triggered by the model.
+        This method is called when the model updates a value that requires a UI action.
+        """
+        try:
+            if panel_id == "Menu":
+                self.menu_toggle()
+        except Exception as e:
+            logging.error(f"Error handling menu action {panel_id}: {e}")
 
     def setup_dual_can_listeners(self):
         """
@@ -279,7 +535,6 @@ class Controller:
                     self.update_value("DRS", drs_state)
                 
                 # Wait before the next update
-                time.sleep(1)
         except Exception as e:
             logging.error(f"Error in demo update thread: {e}")
     
@@ -324,7 +579,7 @@ class Controller:
                 if self.demo_mode:
                     self.view.mode_label.config(text=f"DEMO MODE - {event_name.capitalize()}")
                 else:
-                    self.view.mode_label.config(text=f"AMI: Manual Driving - {event_name.capitalize()}")
+                    self.view.mode_label.config(text=f"{event_name.capitalize()}")
         except Exception as e:
             logging.error(f"Error changing event to {event_name}: {e}")
 
@@ -348,6 +603,18 @@ class Controller:
             return
 
         self.toggle_in_progress = True
+        
+        # Update state tracking
+        if self._is_in_menu_screen():
+            # Going back to previous screen
+            if self.current_event_name:
+                self.current_screen_state = "event"
+            else:
+                self.current_screen_state = "tsoff"
+        else:
+            # Going to menu
+            self.current_screen_state = "menu"
+        
         if hasattr(self.view, 'menu_pop'):
             try:
                 self.view.menu_pop()

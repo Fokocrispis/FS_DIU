@@ -110,6 +110,8 @@ class CANModel:
             return "control"
         elif msg_id in range(0x518, 0x521):  # Software versions on logging
             return "logging"
+        elif 0x420 <= msg_id <= 0x42F:  # DIU range on control
+            return "control"
         else:
             return "unknown"
 
@@ -306,6 +308,9 @@ class AllMsg:
             # Kistler Control (0x300-0x30F)
             *range(0x300, 0x310),
             
+            # DIU Range (0x420-0x42F) - includes heartbeat
+            *range(0x420, 0x430),
+            
             # Software Version Requests (0x516)
             0x516,
             
@@ -318,55 +323,50 @@ class AllMsg:
         Define which message IDs belong to logging bus based on H20 specification (0x330-0x4FF).
         """
         return {
-            # AMS Logging (0x330-0x35F) - 48 IDs
+            # AMS Logging (0x330-0x35F)
             *range(0x330, 0x360),
             
-            # IVTS Logging (0x360-0x36F) - 16 IDs
+            # IVTS Logging (0x360-0x36F)
             *range(0x360, 0x370),
             
-            # CCU Logging (0x370-0x37F) - 16 IDs  
+            # CCU Logging (0x370-0x37F)
             *range(0x370, 0x380),
             
-            # PDU Logging (0x380-0x39F) - 32 IDs
-            *range(0x380, 0x3A0),
+            # PDU Logging (0x380-0x38F)
+            *range(0x380, 0x390),
             
-            # VCU Logging (0x3A0-0x3DF) - 64 IDs  
+            # VCU Logging (0x3A0-0x3DF)
             *range(0x3A0, 0x3E0),
             
-            # ASPU Logging (0x3E0-0x3FF) - 32 IDs
+            # ASPU Logging (0x3E0-0x3FF)
             *range(0x3E0, 0x400),
             
-            # ASCU Logging (0x400-0x41F) - 32 IDs
+            # ASCU Logging (0x400-0x41F)
             *range(0x400, 0x420),
-            
-            # DIU Logging (0x420-0x42F) - 16 IDs
-            *range(0x420, 0x430),
             
             # FSG Logger (0x430)
             0x430,
             
-            # DRS Logging (0x431-0x43F) - 15 IDs
+            # DRS Logging (0x431-0x43F)
             *range(0x431, 0x440),
             
-            # DTU Logging (0x440-0x44F) - 16 IDs
+            # DTU Logging (0x440-0x44F)
             *range(0x440, 0x450),
             
-            # SEN Logging (0x450-0x48F) - 64 IDs
+            # SEN Logging (0x450-0x48F)
             *range(0x450, 0x490),
             
-            # Free range (0x490-0x4CF) - 64 IDs
-            *range(0x490, 0x4D0),
-            
-            # Kistler Logging (0x4D0-0x4DF) - 16 IDs
+            # Kistler Logging (0x4D0-0x4DF)
             *range(0x4D0, 0x4E0),
             
-            # Software Versions (0x518-0x520)
+            # Software version responses
             *range(0x518, 0x521),
         }
 
     def setup_dual_threadsafe_buses(self, control_channel, logging_channel):
         """
-        Setup both ThreadSafeBus instances with fallback to virtual buses.
+        Setup dual ThreadSafeBus instances for concurrent access.
+        Returns tuple of (control_bus, logging_bus).
         """
         control_bus = None
         logging_bus = None
@@ -473,212 +473,329 @@ class AllMsg:
     def register_all_callbacks(self):
         """Register callbacks for all relevant signals from the DBC file based on H20 specification"""
         
-        # === CONTROL BUS SIGNALS ===
+        # === CONTROL BUS SIGNALS (0x240-0x32F) ===
         
-        # DIU Button States (Control Bus: 0x2B0)
+        # DIU Heartbeat monitoring (Control Bus: 0x420)
         self.dispatcher.register_callback(
-            0x2B0, "Menu", 
-            lambda value: self.controller.menu_toggle() if value == 1 else None
+            0x420, "DIU_Heartbeat",
+            lambda value: self.controller.update_value("DIU_Heartbeat_Counter", value)
         )
         
+        # AMS Control Signals (0x240-0x24F)
         self.dispatcher.register_callback(
-            0x2B0, "Ok",
-            lambda value: self.controller.handle_ok_button() if value == 1 else None
+            0x240, "AMS_State",
+            lambda value: self.controller.update_value("AMS_Status", value)
+        )
+        self.dispatcher.register_callback(
+            0x241, "AMS_Error_Code",
+            lambda value: self.controller.update_value("AMS_Error", value)
+        )
+        self.dispatcher.register_callback(
+            0x243, "AMS_SOC_percentage",
+            lambda value: self.controller.model.update_value("SOC", value)
         )
         
+        # VCU Control Signals (0x280-0x28F)
         self.dispatcher.register_callback(
-            0x2B0, "Cooling",
-            lambda value: self.controller.toggle_cooling() if value == 1 else None
+            0x280, "VCU_Motor_Speed",
+            lambda value: self.controller.model.update_value("Speed", value * 3.6)  # Convert to km/h
+        )
+        self.dispatcher.register_callback(
+            0x281, "VCU_Temperature_motor",
+            lambda value: self.controller.model.update_value("Motor Temp", value)
+        )
+        self.dispatcher.register_callback(
+            0x282, "VCU_Temperature_inverter_L",
+            lambda value: self.controller.model.update_value("Inverter L Temp", value)
+        )
+        self.dispatcher.register_callback(
+            0x282, "VCU_Temperature_inverter_R",
+            lambda value: self.controller.model.update_value("Inverter R Temp", value)
         )
         
+        # PDU Control Signals (0x270-0x27F)
         self.dispatcher.register_callback(
-            0x2B0, "Overall_Reset",
-            lambda value: self.controller.perform_reset() if value == 1 else None
+            0x270, "PDU_HV_Voltage",
+            lambda value: self.controller.model.update_value("DC Voltage", value)
+        )
+        self.dispatcher.register_callback(
+            0x271, "PDU_HV_Current",
+            lambda value: self.controller.model.update_value("DC Current", value)
         )
         
+        # SWU Button States (Control Bus: 0x2F0)
         self.dispatcher.register_callback(
-            0x2B0, "TS_On",
-            lambda value: self.controller.toggle_ts() if value == 1 else None
+            0x2F0, "SWU_Button_1_Menu", 
+            lambda value: self.controller.handle_button_press("menu", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_2_OK",
+            lambda value: self.controller.handle_button_press("ok", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_3_TC",
+            lambda value: self.controller.handle_button_press("tc", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_4_TV",
+            lambda value: self.controller.handle_button_press("tv", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_5_DRS",
+            lambda value: self.controller.handle_button_press("drs", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_6_R2D",
+            lambda value: self.controller.handle_button_press("r2d", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_7_Up",
+            lambda value: self.controller.handle_button_press("up", value)
+        )
+        self.dispatcher.register_callback(
+            0x2F0, "SWU_Button_8_Down",
+            lambda value: self.controller.handle_button_press("down", value)
         )
         
+        # SWU Rotary Encoders (0x2F1)
         self.dispatcher.register_callback(
-            0x2B0, "R2D",
-            lambda value: self.controller.toggle_r2d() if value == 1 else None
+            0x2F1, "SWU_Rotary_1",
+            lambda value: self.controller.handle_rotary_change(1, value)
+        )
+        self.dispatcher.register_callback(
+            0x2F1, "SWU_Rotary_2",
+            lambda value: self.controller.handle_rotary_change(2, value)
         )
         
+        # DRS Control (0x2C0-0x2CF)
         self.dispatcher.register_callback(
-            0x2B0, "9_Down_RadioActive",
-            lambda value: self.controller.handle_down_button() if value == 1 else None
+            0x2C0, "DRS_Status",
+            lambda value: self.controller.model.update_value("DRS", "Active" if value else "Inactive")
         )
         
-        self.dispatcher.register_callback(
-            0x2B0, "Up_DRS",
-            lambda value: self.controller.handle_up_button() if value == 1 else None
-        )
+        # === LOGGING BUS SIGNALS (0x330+) ===
         
-        # AMS Control signals (Control Bus: 0x243)
-        self.dispatcher.register_callback(
-            0x243, "SOC_percentage_from_Coloumb_Counting",
-            lambda value: self.controller.update_value("SOC", value)
-        )
-        
-        # === LOGGING BUS SIGNALS ===
-        
-        # AMS Cell Voltages (Logging Bus: 0x333-0x344)
-        for msg_id in range(0x333, 0x345):  # AMS_Cell_V_000_007 to AMS_Cell_V_136_143
-            message_offset = (msg_id - 0x333) * 8
-            for local_idx in range(8):
-                global_cell_idx = message_offset + local_idx
-                signal_name = f"AMS_Cell_V_{global_cell_idx:03d}"
-                self.dispatcher.register_callback(
-                    msg_id, signal_name, 
-                    lambda value, cidx=global_cell_idx: self.controller._on_cell_voltage_update(cidx, value)
-                )
-        
-        # AMS Temperatures (Logging Bus: 0x345-0x34B)  
-        for msg_id in range(0x345, 0x34C):  # AMS_Temp_000_007 to AMS_Temp_048_053
-            temp_offset = (msg_id - 0x345) * 8
-            for local_idx in range(8):
-                global_temp_idx = temp_offset + local_idx
-                signal_name = f"AMS_Temp_{global_temp_idx:03d}"
+        # AMS Cell Voltages (0x330-0x337)
+        for msg_idx in range(8):  # 8 messages
+            msg_id = 0x330 + msg_idx
+            for cell_idx in range(8):  # 8 cells per message
+                signal_name = f"AMS_Cell_V_{msg_idx*8 + cell_idx + 1:03d}"
+                global_idx = msg_idx * 8 + cell_idx + 1
                 self.dispatcher.register_callback(
                     msg_id, signal_name,
-                    lambda value, temp_idx=global_temp_idx: 
-                        self.controller.update_value("Accu Temp", value) if value > (self.controller.model.get_value("Accu Temp") or 0) else None
+                    lambda value, idx=global_idx: self.controller.model.map_cell_voltage(idx, value)
                 )
         
-        # VCU Sensor Data (Logging Bus: 0x3A0-0x3DF range)
-        # These will need to be updated with actual signal names from the DBC file
+        # AMS Temperatures (0x340-0x34F)
+        for msg_idx in range(16):  # 16 messages
+            msg_id = 0x340 + msg_idx
+            for temp_idx in range(4):  # 4 temperatures per message
+                signal_name = f"AMS_Temp_{msg_idx*4 + temp_idx + 1:03d}"
+                global_idx = msg_idx * 4 + temp_idx + 1
+                self.dispatcher.register_callback(
+                    msg_id, signal_name,
+                    lambda value, idx=global_idx: self.controller.model.map_temp_value(idx, value)
+                )
+        
+        # AMS Logging Data (0x350)
         self.dispatcher.register_callback(
-            0x3A0, "VCU_Temp_Motor",
-            lambda value: self.controller.update_value("Motor Temp", value)
+            0x350, "AMS_Pack_Voltage",
+            lambda value: self.controller.model.update_value("DC Voltage", value)
+        )
+        self.dispatcher.register_callback(
+            0x350, "AMS_Pack_Current", 
+            lambda value: self.controller.model.update_value("DC Current", value)
+        )
+        self.dispatcher.register_callback(
+            0x351, "AMS_Lowest_Cell_Voltage",
+            lambda value: self.controller.model.update_value("Cell Min V", value)
+        )
+        self.dispatcher.register_callback(
+            0x351, "AMS_Highest_Cell_Voltage",
+            lambda value: self.controller.model.update_value("Cell Max V", value)
         )
         
+        # VCU Logging Data (0x3A0-0x3DF)
         self.dispatcher.register_callback(
-            0x3A1, "VCU_Temp_Inverter_IGBT",
-            lambda value: self.controller.update_value("Inverter Temp", value)
+            0x3A0, "VCU_Wheel_Speed_FL",
+            lambda value: self.controller.model.update_value("Front Left Wheel", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A0, "VCU_Wheel_Speed_FR",
+            lambda value: self.controller.model.update_value("Front Right Wheel", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A1, "VCU_Wheel_Speed_RL",
+            lambda value: self.controller.model.update_value("Rear Left Wheel", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A1, "VCU_Wheel_Speed_RR",
+            lambda value: self.controller.model.update_value("Rear Right Wheel", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A2, "VCU_Yaw_Rate",
+            lambda value: self.controller.model.update_value("Yaw Rate", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A3, "VCU_Lateral_G",
+            lambda value: self.controller.model.update_value("Lateral G", value)
+        )
+        self.dispatcher.register_callback(
+            0x3A3, "VCU_Longitudinal_G",
+            lambda value: self.controller.model.update_value("Longitudinal G", value)
         )
         
-        # ASPU Vehicle Data (Logging Bus)
+        # PDU Logging Data (0x380-0x38F)
         self.dispatcher.register_callback(
-            0x3E0, "speed_actual",
-            lambda value: self.controller.update_value("Speed", value)
+            0x380, "PDU_Watt_Hours",
+            lambda value: self.controller.model.update_value("Watt Hours", value)
         )
-
-    def apply_filter(self):
-        """Apply filters to the Treeview"""
-        self.update_tree()
-
-    def clear_filter(self):
-        """Clear all filters"""
-        self.id_filter.delete(0, tk.END)
-        self.signal_filter.delete(0, tk.END)
-        self.bus_filter.set("All")
-        self.update_tree()
-
-    def toggle_simulation(self):
-        """Toggle the simulation mode on/off"""
-        self.sim_running = not self.sim_running
+        self.dispatcher.register_callback(
+            0x381, "PDU_Energy_Used",
+            lambda value: self.controller.model.update_value("Energy Used", value / 1000)  # Convert to kWh
+        )
         
-        if self.sim_running:
-            self.simulate_button.config(text="Stop Simulation")
-            self.start_simulation()
-        else:
-            self.simulate_button.config(text="Start Simulation")
-            self.stop_simulation()
+        # IVTS Data (0x360-0x36F)
+        self.dispatcher.register_callback(
+            0x360, "IVTS_Throttle_Position",
+            lambda value: self.controller.model.update_value("Throttle", value)
+        )
+        self.dispatcher.register_callback(
+            0x360, "IVTS_Brake_Pressure",
+            lambda value: self.controller.model.update_value("Brake", value)
+        )
+        self.dispatcher.register_callback(
+            0x361, "IVTS_Steering_Angle",
+            lambda value: self.controller.model.update_value("Steering", value)
+        )
+        
+        # Sensor Data (0x450-0x48F)
+        self.dispatcher.register_callback(
+            0x450, "SEN_IMU_Yaw_Rate",
+            lambda value: self.controller.model.update_value("Yaw Rate", value)
+        )
+        self.dispatcher.register_callback(
+            0x451, "SEN_IMU_Accel_Lat",
+            lambda value: self.controller.model.update_value("Lateral G", value / 9.81)  # Convert to g
+        )
+        self.dispatcher.register_callback(
+            0x451, "SEN_IMU_Accel_Long",
+            lambda value: self.controller.model.update_value("Longitudinal G", value / 9.81)  # Convert to g
+        )
+        
+        # ECU Heartbeats (various IDs)
+        heartbeat_ecus = {
+            0x022: "AMS",
+            0x023: "ASCU", 
+            0x025: "DIU",
+            0x240: "AMS",
+            0x250: "IVTS",
+            0x260: "CCU",
+            0x270: "PDU",
+            0x280: "VCU",
+            0x290: "ASPU",
+            0x2A0: "ASCU",
+            0x2B0: "DIU",
+            0x2C0: "DRS",
+            0x2D0: "DTU",
+            0x2E0: "SEN",
+            0x2F0: "SWU"
+        }
+        
+        for msg_id, ecu_name in heartbeat_ecus.items():
+            self.dispatcher.register_callback(
+                msg_id, f"{ecu_name}_Heartbeat",
+                lambda value, name=ecu_name: self.controller.handle_heartbeat(name, value)
+            )
+        
+        # Software Version Messages (0x516 request, 0x518-0x520 responses)
+        version_ecus = {
+            0x518: "AMS",
+            0x519: "VCU",
+            0x51A: "PDU",
+            0x51B: "IVTS",
+            0x51C: "CCU",
+            0x51D: "ASPU",
+            0x51E: "ASCU",
+            0x51F: "DIU",
+            0x520: "DRS"
+        }
+        
+        for msg_id, ecu_name in version_ecus.items():
+            self.dispatcher.register_callback(
+                msg_id, f"{ecu_name}_SW_Version",
+                lambda value, name=ecu_name: self.controller.model.update_value(f"{name}_Version", value)
+            )
+        
+        logger.info(f"Registered {len(self.dispatcher.callbacks)} callbacks for CAN signal processing")
 
-    def start_simulation(self):
-        """Start the simulation of CAN messages for both buses"""
-        if hasattr(self, 'sim_thread') and self.sim_thread and self.sim_thread.is_alive():
+    def receive_messages(self):
+        """Receive messages from both CAN buses"""
+        if not self.running:
             return
             
-        self.sim_running = True
-        self.sim_thread = threading.Thread(target=self.simulation_loop, daemon=True)
-        self.sim_thread.start()
-        self.status_bar.config(text="Simulation active on both buses")
-
-    def stop_simulation(self):
-        """Stop the simulation of CAN messages"""
-        self.sim_running = False
-        if hasattr(self, 'sim_thread') and self.sim_thread:
-            self.sim_thread.join(timeout=0.5)
-        self.status_bar.config(text="Simulation stopped")
-
-    def simulation_loop(self):
-        """Generate simulated CAN messages for both control and logging buses"""
-        # Control bus message IDs
-        control_message_ids = [0x2B0, 0x243, 0x2A0]  # DIU buttons, AMS SOC, ASCU control
-        
-        # Logging bus message IDs  
-        logging_message_ids = [0x333, 0x345, 0x3A0, 0x3E0]  # Cell voltages, temps, VCU, ASPU
-        
-        # Simulation state variables
-        soc = 100.0
-        cell_voltages = [4.2] * 144  # 144 cells
-        temperatures = [25.0] * 54   # 54 temperature sensors
-        motor_temp = 25.0
-        speed = 0.0
-        button_states = 0
-        
-        while self.sim_running:
-            # Simulate control bus messages
-            if random.random() < 0.3:  # 30% chance
-                msg_id = random.choice(control_message_ids)
-                if msg_id == 0x2B0:  # DIU buttons
-                    if random.random() < 0.1:  # 10% chance to press a button
-                        button_states = 1 << random.randint(0, 7)
-                    else:
-                        button_states = 0
-                    data = bytearray([button_states])
-                elif msg_id == 0x243:  # AMS SOC
-                    soc = max(0, soc - random.uniform(0, 0.1))
-                    data = bytearray([int(soc), int(soc), 0, 0, 0, 0, 0, 0])
-                else:
-                    data = bytearray([random.randint(0, 255) for _ in range(8)])
+        # Check control bus
+        if self.control_bus:
+            try:
+                msg = self.control_bus.recv(timeout=0.01)
+                if msg:
+                    self.process_message(msg, bus_type="control")
+            except can.CanError:
+                pass
                 
-                # Create and process control bus message
-                message = can.Message(
-                    arbitration_id=msg_id,
-                    data=data,
-                    is_extended_id=False,
-                    timestamp=time.time()
-                )
-                self.process_message(message, bus_type="control")
-            
-            # Simulate logging bus messages
-            if random.random() < 0.7:  # 70% chance
-                msg_id = random.choice(logging_message_ids)
-                if msg_id == 0x333:  # Cell voltages
-                    # Update cell voltages with slight variation
-                    base_voltage = 3.7 + (soc / 100.0) * 0.5
-                    data = bytearray()
-                    for i in range(8):
-                        voltage = base_voltage + random.uniform(-0.1, 0.1)
-                        voltage_raw = int((voltage - 2.5) / 0.01)  # Convert to raw value
-                        data.append(max(0, min(255, voltage_raw)))
-                elif msg_id == 0x345:  # Temperatures
-                    data = bytearray()
-                    for i in range(8):
-                        temp = 25 + random.uniform(-5, 15)
-                        data.append(int(temp))
-                else:
-                    data = bytearray([random.randint(0, 255) for _ in range(8)])
-                
-                # Create and process logging bus message
-                message = can.Message(
-                    arbitration_id=msg_id,
-                    data=data,
-                    is_extended_id=False,
-                    timestamp=time.time()
-                )
-                self.process_message(message, bus_type="logging")
-            
-            # Sleep between messages
-            time.sleep(random.uniform(0.05, 0.2))
+        # Check logging bus
+        if self.logging_bus:
+            try:
+                msg = self.logging_bus.recv(timeout=0.01)
+                if msg:
+                    self.process_message(msg, bus_type="logging")
+            except can.CanError:
+                pass
+        
+        # Schedule next check
+        self.root.after(50, self.receive_messages)
 
-    def update_tree(self):
-        """Refresh the Treeview with current message data, applying filters"""
-        # Clear existing entries
+    def process_message(self, msg, bus_type="unknown"):
+        """Process a CAN message, update the display and dispatch to callbacks"""
+        if not self.db:
+            return
+            
+        try:
+            decoded = decode_message(self.db, msg)
+            if decoded:
+                current_time = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                
+                if msg.arbitration_id not in self.msg_data:
+                    self.msg_data[msg.arbitration_id] = {}
+                    
+                for signal_name, value in decoded.items():
+                    # Get signal unit
+                    unit = ""
+                    try:
+                        signal = self.db.get_message_by_frame_id(msg.arbitration_id).get_signal_by_name(signal_name)
+                        unit = signal.unit if hasattr(signal, 'unit') else ""
+                    except:
+                        pass
+                        
+                    # Store with bus information
+                    self.msg_data[msg.arbitration_id][signal_name] = {
+                        'value': value,
+                        'unit': unit,
+                        'time': current_time,
+                        'bus': bus_type.capitalize()
+                    }
+                
+                # Dispatch callbacks
+                self.dispatcher.dispatch(msg.arbitration_id, decoded, bus_type)
+                
+                # Update display
+                self.update_display()
+        except Exception as e:
+            logger.debug(f"Error processing message: {e}")
+
+    def update_display(self):
+        """Update the tree view with current message data"""
+        # Clear all items
         for item in self.tree.get_children():
             self.tree.delete(item)
         
@@ -715,96 +832,154 @@ class AllMsg:
         # Update status bar
         self.status_bar.config(text=f"Showing {row_count} signals from {len(self.msg_data)} message IDs")
 
-    def process_message(self, msg, bus_type="unknown"):
-        """Process a CAN message, update the display and dispatch to callbacks"""
-        if not self.db:
-            return
+    def apply_filter(self):
+        """Apply the filter by updating the display"""
+        self.update_display()
+
+    def clear_filter(self):
+        """Clear all filters"""
+        self.id_filter.delete(0, tk.END)
+        self.signal_filter.delete(0, tk.END)
+        self.bus_filter.set("All")
+        self.update_display()
+
+    def toggle_simulation(self):
+        """Toggle simulation mode"""
+        if self.sim_running:
+            self.stop_simulation()
+        else:
+            self.start_simulation()
+
+    def start_simulation(self):
+        """Start simulating CAN messages"""
+        self.sim_running = True
+        self.simulate_button.config(text="Stop Simulation")
+        self.simulation_thread = threading.Thread(target=self._simulate_messages, daemon=True)
+        self.simulation_thread.start()
+        logger.info("Simulation started")
+
+    def stop_simulation(self):
+        """Stop simulating CAN messages"""
+        self.sim_running = False
+        self.simulate_button.config(text="Start Simulation")
+        logger.info("Simulation stopped")
+
+    def _simulate_messages(self):
+        """Generate simulated CAN messages for testing"""
+        # Get message IDs for both buses
+        control_message_ids = list(self.control_message_ids)
+        logging_message_ids = list(self.logging_message_ids)
+        
+        # State variables for realistic simulation
+        soc = 100.0
+        speed = 0.0
+        motor_temp = 20.0
+        inverter_temp = 20.0
+        diu_heartbeat = 0
+        switch_states = [0, 0, 0, 0, 0]  # 5 switches
+        
+        while self.sim_running:
+            # Simulate control bus messages
+            if random.random() < 0.8:  # 80% chance
+                msg_id = random.choice(control_message_ids)
+                
+                if msg_id == 0x420:  # DIU heartbeat
+                    # Simulate DIU heartbeat - increment counter every time
+                    diu_heartbeat = (diu_heartbeat + 1) % 256
+                    data = bytearray([diu_heartbeat, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+                    
+                elif msg_id == 0x2F0:  # SWU buttons
+                    if random.random() < 0.1:  # 10% chance to press a button
+                        button_states = 1 << random.randint(0, 7)
+                    else:
+                        button_states = 0
+                    data = bytearray([button_states])
+                    
+                elif msg_id == 0x2F1:  # SWU switches
+                    # Occasionally change switch positions
+                    if random.random() < 0.05:  # 5% chance
+                        switch_idx = random.randint(0, 4)
+                        switch_states[switch_idx] = random.randint(0, 15)
+                    
+                    # Pack switch states (4 bits each)
+                    data = bytearray([
+                        (switch_states[1] << 4) | switch_states[0],  # Switches 1-2
+                        (switch_states[3] << 4) | switch_states[2],  # Switches 3-4
+                        switch_states[4],  # Switch 5
+                        0x00, 0x00, 0x00, 0x00, 0x00
+                    ])
+                    
+                else:
+                    data = bytearray([random.randint(0, 255) for _ in range(8)])
+                
+                # Create and process control bus message
+                message = can.Message(
+                    arbitration_id=msg_id,
+                    data=data,
+                    is_extended_id=False,
+                    timestamp=time.time()
+                )
+                self.process_message(message, bus_type="control")
             
-        try:
-            decoded = decode_message(self.db, msg)
-            if decoded:
-                current_time = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+            # Simulate logging bus messages
+            if random.random() < 0.7:  # 70% chance
+                msg_id = random.choice(logging_message_ids)
                 
-                if msg.arbitration_id not in self.msg_data:
-                    self.msg_data[msg.arbitration_id] = {}
+                if msg_id == 0x330:  # AMS SOC
+                    soc = max(0, soc - random.uniform(0, 0.1))
+                    data = bytearray([int(soc), int(soc), 0, 0, 0, 0, 0, 0])
                     
-                for signal_name, value in decoded.items():
-                    # Get signal unit
-                    unit = ""
-                    try:
-                        signal = self.db.get_message_by_frame_id(msg.arbitration_id).get_signal_by_name(signal_name)
-                        unit = signal.unit if hasattr(signal, 'unit') else ""
-                    except:
-                        pass
+                elif msg_id == 0x333:  # Cell voltages
+                    # Update cell voltages with slight variation
+                    base_voltage = 3.7 + (soc / 100.0) * 0.5
+                    cell_voltages = [base_voltage + random.uniform(-0.05, 0.05) for _ in range(8)]
+                    data = bytearray()
+                    for v in cell_voltages:
+                        # Pack as 16-bit value (voltage * 1000)
+                        v_int = int(v * 1000)
+                        data.extend([(v_int >> 8) & 0xFF, v_int & 0xFF])
+                    data = data[:8]  # Ensure 8 bytes
+                    
+                elif msg_id in range(0x3A0, 0x3A4):  # VCU data
+                    if msg_id == 0x3A0:  # Wheel speeds
+                        speed += random.uniform(-5, 10)
+                        speed = max(0, min(200, speed))
+                        data = bytearray([int(speed), int(speed), int(speed), int(speed), 0, 0, 0, 0])
+                    else:
+                        data = bytearray([random.randint(0, 255) for _ in range(8)])
                         
-                    # Store with bus information
-                    self.msg_data[msg.arbitration_id][signal_name] = {
-                        'value': value,
-                        'unit': unit,
-                        'time': current_time,
-                        'bus': bus_type
-                    }
+                else:
+                    data = bytearray([random.randint(0, 255) for _ in range(8)])
                 
-                # Dispatch to callbacks
-                self.dispatcher.dispatch(msg.arbitration_id, decoded, bus_type)
-                
-            else:
-                # Store raw message data if decoding failed
-                if msg.arbitration_id not in self.msg_data:
-                    self.msg_data[msg.arbitration_id] = {}
-                    
-                self.msg_data[msg.arbitration_id]["RAW_DATA"] = {
-                    'value': ' '.join(f'{b:02X}' for b in msg.data),
-                    'unit': "",
-                    'time': datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3],
-                    'bus': bus_type
-                }
-        except Exception as e:
-            logger.error(f"Error processing message from {bus_type} bus: {e}")
-                
-        # Update the tree view
-        self.update_tree()
-
-    def receive_messages(self):
-        """Periodically receive CAN messages from both buses"""
-        if not self.running:
-            return
-
-        # Receive from control bus
-        if self.control_bus:
-            try:
-                message = self.control_bus.recv(timeout=0.025)
-                if message:
-                    self.process_message(message, bus_type="control")
-            except Exception as e:
-                logger.error(f"Error receiving from control bus: {e}")
-
-        # Receive from logging bus  
-        if self.logging_bus:
-            try:
-                message = self.logging_bus.recv(timeout=0.025)
-                if message:
-                    self.process_message(message, bus_type="logging")
-            except Exception as e:
-                logger.error(f"Error receiving from logging bus: {e}")
-
-        # Schedule the next reception
-        self.root.after(50, self.receive_messages)
+                # Create and process logging bus message
+                message = can.Message(
+                    arbitration_id=msg_id,
+                    data=data,
+                    is_extended_id=False,
+                    timestamp=time.time()
+                )
+                self.process_message(message, bus_type="logging")
+            
+            time.sleep(0.1)  # 10Hz simulation rate
 
     def stop(self):
-        """Stop receiving messages and shut down both CAN buses"""
+        """Stop the monitor and cleanup"""
         self.running = False
-        self.sim_running = False
+        if hasattr(self, 'simulation_thread') and self.simulation_thread.is_alive():
+            self.sim_running = False
+            self.simulation_thread.join(timeout=1.0)
         
-        if hasattr(self, 'sim_thread') and self.sim_thread and self.sim_thread.is_alive():
-            self.sim_thread.join(timeout=0.5)
-            
-        for bus_name, bus in [("control", self.control_bus), ("logging", self.logging_bus)]:
-            if bus:
-                try:
-                    bus.shutdown()
-                    logger.info(f"{bus_name.capitalize()} bus stopped")
-                except Exception as e:
-                    logger.error(f"Error stopping {bus_name} bus: {e}")
-                    
+        # Close both buses
+        if self.control_bus:
+            try:
+                self.control_bus.shutdown()
+            except:
+                pass
+                
+        if self.logging_bus:
+            try:
+                self.logging_bus.shutdown()
+            except:
+                pass
+                
         self.root.destroy()
